@@ -1,9 +1,6 @@
 package me.boecki.SignCodePad;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import org.bukkit.Location;
 
 public class CalibrationSettings {
 	public CalibrationSettings(){

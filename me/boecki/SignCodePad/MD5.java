@@ -1,7 +1,6 @@
 package me.boecki.SignCodePad;
 
-import java.security.*;
-import org.bukkit.entity.Player;
+import java.security.MessageDigest;
 
 public class MD5 {
 	private String Result;

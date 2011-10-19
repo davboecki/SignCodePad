@@ -1,6 +1,5 @@
 package me.boecki.SignCodePad.yaml;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import me.boecki.SignCodePad.Calibration;
@@ -10,9 +9,7 @@ import me.boecki.SignCodePad.SignLoc;
 
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeId;
 
 public class MyYamlConstructor extends Constructor {
     private HashMap<String,Class<?>> classMap = new HashMap<String,Class<?>>();

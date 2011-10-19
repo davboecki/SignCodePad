@@ -1,26 +1,17 @@
 package me.boecki.SignCodePad.event;
 
 import me.boecki.SignCodePad.MD5;
-import me.boecki.SignCodePad.RedstoneTorchReset;
 import me.boecki.SignCodePad.SignCodePad;
 import me.boecki.SignCodePad.SignLoc;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-
-import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.UnsupportedEncodingException;
-
-import java.security.*;
-import java.util.HashMap;
 
 
 public class SignCreate extends BlockListener {

@@ -1,28 +1,16 @@
 package me.boecki.SignCodePad;
 
-import me.boecki.SignCodePad.MD5;
 import me.boecki.SignCodePad.event.CalSaver;
 
-import net.minecraft.server.EntityPlayer;
-
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-
 import org.bukkit.entity.Player;
-
-import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
-
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.awt.Color;
 
 
 public class CodePadPlayerListener extends PlayerListener {

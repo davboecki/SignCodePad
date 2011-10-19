@@ -1,7 +1,6 @@
 package me.boecki.SignCodePad;
 
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.World;
 
 public class SignLoc {

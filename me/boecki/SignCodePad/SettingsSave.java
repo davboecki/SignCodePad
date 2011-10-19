@@ -1,6 +1,6 @@
 package me.boecki.SignCodePad;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class SettingsSave {
 	public SettingsSave(){}

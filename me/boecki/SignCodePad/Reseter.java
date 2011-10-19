@@ -1,8 +1,7 @@
 package me.boecki.SignCodePad;
 
-import java.util.*;
+import java.util.Date;
 
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 public class Reseter extends Thread{

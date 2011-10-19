@@ -1,6 +1,5 @@
 package me.boecki.SignCodePad;
 
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 public class CalNoteThread extends Reseter{
