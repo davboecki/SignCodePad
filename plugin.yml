@@ -1,0 +1,19 @@
+name: SignCodePad
+main: me.boecki.SignCodePad.SignCodePad
+version: 1.0
+website: http://dev.bukkit.org/server-mods/signcodepad/
+dev-url: http://dev.bukkit.org/server-mods/signcodepad/
+
+permissions:
+  SignCodePad.*:
+    description: All commands
+    children:
+      SignCodePad.masterdestroy: true
+      SignCodePad.use: true
+      SignCodePad.create: true
+  SignCodePad.masterdestroy:
+    default: op
+  SignCodePad.use:
+    default: false
+  SignCodePad.create:
+    default: false
