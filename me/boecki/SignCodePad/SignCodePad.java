@@ -133,17 +133,18 @@ public class SignCodePad extends JavaPlugin {
         }
 
         if (SettingsSave.Settings != null) {
-            for (SignLoc loc : SettingsSave.Settings.keySet()) {
-                for (String key : SettingsSave.Settings.get(loc).keySet()) {
-                    if (SettingsSave.Settings.get(loc).get(key).getClass() == SignLoc.class) {
-                        SettingsSave.Settings.get(loc)
+            for (Object locObject : SettingsSave.Settings.keySet()) {
+            	SignLoc loc = new SignLoc(locObject);
+                for (String key : SettingsSave.Settings.get(locObject).keySet()) {
+                    if (SettingsSave.Settings.get(locObject).get(key).getClass() == SignLoc.class) {
+                        SettingsSave.Settings.get(locObject)
                                              .put(key,
                             getLocation(
-                                (SignLoc) SettingsSave.Settings.get(loc).get(key)));
+                                (SignLoc) SettingsSave.Settings.get(locObject).get(key)));
                     }
                 }
 
-                Settings.put(getLocation(loc), (HashMap<String, Object>)SettingsSave.Settings.get(loc));
+                Settings.put(getLocation(loc), (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
             }
         }
 
