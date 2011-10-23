@@ -78,7 +78,8 @@ public class SignCreate extends BlockListener {
     }
 
     public void onSignChange(SignChangeEvent event) {
-        if (event.getLine(0).equalsIgnoreCase("[SignCodePad]")) {
+    	 if (event.getBlock().getTypeId() != Material.WALL_SIGN.getId()) return;
+    	 if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
         	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
         		event.getBlock().setType(Material.AIR);
