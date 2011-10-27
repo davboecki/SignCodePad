@@ -16,6 +16,6 @@ public class CalNoteThread extends Reseter{
 		player.sendMessage("");
 		player.sendMessage("");
 		player.sendMessage("§cto calibrate the plugin.");
-		player.sendMessage("§cIf you change your TexturePack please do this ones more.");
+		player.sendMessage("§cIf you change your TexturePack please do this once more.");
 	}
 }

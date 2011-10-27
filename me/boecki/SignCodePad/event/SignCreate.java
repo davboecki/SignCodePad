@@ -78,7 +78,15 @@ public class SignCreate extends BlockListener {
     }
 
     public void onSignChange(SignChangeEvent event) {
-    	 if (event.getBlock().getTypeId() != Material.WALL_SIGN.getId()) return;
+    	if (event.getBlock().getTypeId() == Material.SIGN_POST.getId()){
+    		if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
+    			event.setLine(0, "Please");
+                event.setLine(1, "create");
+                event.setLine(2, "a");
+                event.setLine(3, "wallsign");
+    		}
+    	}
+    	if (event.getBlock().getTypeId() != Material.WALL_SIGN.getId()) return;
     	 if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
         	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
@@ -105,62 +113,86 @@ public class SignCreate extends BlockListener {
             		return;
             	}
                 boolean Worked = true;
-                int Number = 0;
+                String Code = "";
 
                 try {
-                    Number = Integer.parseInt(event.getLine(1));
+                	Code = event.getLine(1);
                 } catch (Exception e) {
                     Worked = false;
                 }
-
+                
+                if(Worked)
+                	for(int i=0;i<4;i++){
+                		switch(Code.charAt(i)){
+	            			case '0':
+	            			case '1':
+	            			case '2':
+	            			case '3':
+	            			case '4':
+	            			case '5':
+	            			case '6':
+	            			case '7':
+	            			case '8':
+	            			case '9':
+	            			case '*':
+	            			case '#':
+	            				break;
+	            			default:
+	            				Worked = false;
+	            		}
+	            	}
+            
                 if (Worked) {
-                    if ((Number < 10000) && (Number > 999)) {
-                        MD5 md5 = new MD5(Number);
+                    if (Code.length() == 4) {
+                    	
+                    	MD5 md5 = new MD5(Code);
 
-                        if (md5.isGen()) {
-                            if (!Zeiledrei(event.getLine(2), event) ||
-                                    !Zeilevier(event.getLine(3), event)) {
-                                return;
-                            }
-
-                            plugin.setSetting(event.getBlock().getLocation(),
-                                "MD5", md5.getValue());
-                            plugin.setSetting(event.getBlock().getLocation(), "Owner",
-                                    event.getPlayer().getName());
-
-                            event.setLine(0, "1 2 3 |       ");
-                            event.setLine(1, "4 5 6 | ----");
-                            event.setLine(2, "7 8 9 |  <<- ");
-                            event.setLine(3, "* 0 # |  OK  ");
-
-                            Block block = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location"));
-                            if(block.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"SignCodePad.replaceblock")){
-                            	event.getPlayer().sendMessage("OK-Target not Air.");
-                            	if (plugin.hasSetting(event.getBlock().getLocation())) {
-                                    plugin.removeSetting(event.getBlock().getLocation());
-                                    plugin.save();
-                                }
-                            	return;
-                            }
-                            block.setTypeId(Material.TORCH.getId());
-                            if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
-                                Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
-                                if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"SignCodePad.replaceblock")){
-                                	event.getPlayer().sendMessage("Error-Target not Air.");
-                                	if (plugin.hasSetting(event.getBlock().getLocation())) {
-                                        plugin.removeSetting(event.getBlock().getLocation());
-                                        plugin.save();
-                                    }
-                                	return;
-                                }
-                                blockb.setTypeId(Material.TORCH.getId());
-                            }
-                            plugin.save();
-                            event.getPlayer().sendMessage("CodePad Created.");
-                        } else {
+                        if (!md5.isGen()) {
                             event.getPlayer()
-                                 .sendMessage("Internal Error (MD5).");
+                            .sendMessage("Internal Error (MD5).");
+                            return;
                         }
+                        MD5 md5b = new MD5(md5.getValue());
+
+                        if (!md5b.isGen()) {
+                            event.getPlayer()
+                            .sendMessage("Internal Error (MD5).");
+                            return;
+                        }
+                        if (!Zeiledrei(event.getLine(2), event) ||
+                                !Zeilevier(event.getLine(3), event)) {
+                             return;
+                         }
+                         plugin.setSetting(event.getBlock().getLocation(),"MD5", md5b.getValue());
+                         plugin.setSetting(event.getBlock().getLocation(), "Owner",event.getPlayer().getName());
+                         event.setLine(0, "1 2 3 |       ");
+                         event.setLine(1, "4 5 6 | ----");
+                         event.setLine(2, "7 8 9 |  <<- ");
+                         event.setLine(3, "* 0 # |  OK  ");
+                         Block block = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location"));
+                         if(block.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"SignCodePad.replaceblock")){
+                        	event.getPlayer().sendMessage("OK-Target not air.");
+                        	if (plugin.hasSetting(event.getBlock().getLocation())) {
+                        		plugin.removeSetting(event.getBlock().getLocation());
+                        		plugin.save();
+                        	}
+                        	return;
+                         }
+                         block.setTypeId(Material.TORCH.getId());
+                         if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
+                        	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
+                        	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"SignCodePad.replaceblock")){
+                        		 event.getPlayer().sendMessage("Error-Target not air.");
+                        		 if (plugin.hasSetting(event.getBlock().getLocation())) {
+                        			 plugin.removeSetting(event.getBlock().getLocation());
+                        			 plugin.save();
+                        		 }
+                        		 return;
+                        	 }
+                        	 blockb.setTypeId(Material.TORCH.getId());
+                         }
+                         plugin.save();
+                         event.getPlayer().sendMessage("CodePad Created.");
                     } else {
                         event.getPlayer().sendMessage("Wrong Code.");
                     }
@@ -313,15 +345,15 @@ public class SignCreate extends BlockListener {
             plugin.setSetting(event.getBlock().getLocation(), "Error-Location",
                 new Location(event.getBlock().getWorld(), 0, -1, 0));
         }
-
+        /*
         if ((linesplit.length > 2) && (linesplit[2] != "")) {
             String sCount = linesplit[2];
             int Count = Integer.parseInt(sCount);
             plugin.setSetting(event.getBlock().getLocation(), "Error-Count",
                 Count);
-        } else {
+        } else {*/
             plugin.setSetting(event.getBlock().getLocation(), "Error-Count", 0);
-        }
+        //}
 
         return true;
     }

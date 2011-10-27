@@ -5,12 +5,17 @@ import java.security.MessageDigest;
 public class MD5 {
 	private String Result;
 	private boolean Valid=false;
-public MD5(double Number){
-	try{
+	
+	public MD5(double Number){
+		this(""+(int)Number);
+	}
+	
+	public MD5(String Code){
+			try{
 	        /* Berechnung */
 	        MessageDigest md5 = MessageDigest.getInstance("MD5");
 	        md5.reset();
-	        md5.update((""+(int)Number).getBytes());
+	        md5.update(Code.getBytes());
 	        byte[] result = md5.digest();
 
 	        /* Ausgabe */
@@ -23,10 +28,10 @@ public MD5(double Number){
 	        }
 	        Result = hexString.toString();
 	        Valid = true;
-	}catch(Exception e){
-		e.printStackTrace();
-        Valid = false;
-	}
+		}catch(Exception e){
+			e.printStackTrace();
+			Valid = false;
+		}
 }
 public boolean isGen(){
 	return Valid;

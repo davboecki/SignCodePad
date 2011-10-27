@@ -24,7 +24,7 @@ import org.yaml.snakeyaml.reader.UnicodeReader;
 
 
 public class SignCodePad extends JavaPlugin {
-    public HashMap<Location, Double> CodeEnter = new HashMap<Location, Double>();
+    public HashMap<Location, String> CodeEnter = new HashMap<Location, String>();
     public HashMap<Location, Double> EnterTimeout = new HashMap<Location, Double>();
     public HashMap<Location, Integer> ErrorCount = new HashMap<Location, Integer>();
     public HashMap<String,SignLoc> CalLoc = new HashMap<String,SignLoc>();

@@ -162,12 +162,8 @@ public class CodePadPlayerListener extends PlayerListener {
             (z * z)))) - y + 0.3) * -2;
     }
 
-    private void Sternchen(double Number, Sign sign) {
-        int Anzahl = ("" + (int) Number).length();
-
-        if (Number == 0) {
-            Anzahl = 0;
-        }
+    private void Sternchen(String Code, Sign sign) {
+        int Anzahl = Code.length();
 
         StringBuilder Line = new StringBuilder();
         Line.append("4 5 6 | ");
@@ -396,51 +392,37 @@ public class CodePadPlayerListener extends PlayerListener {
 
                 char Result = Zuordnung[(int) Zeile - 1][(int) Spalte - 1];
 
-                if ((Result != 'X') && (Result != 'R') && (Result != '*') &&
-                        (Result != '#') && (Result != 'K')) {
-                    if (plugin.CodeEnter.containsKey(event.getClickedBlock()
-                                                              .getLocation())) {
-                        if ((plugin.CodeEnter.get(event.getClickedBlock()
-                                                           .getLocation()) * 10) > 10000) {
+                if ((Result != 'X') && (Result != 'R') && (Result != 'K')) {
+                    if (plugin.CodeEnter.containsKey(event.getClickedBlock().getLocation())) {
+                        if (plugin.CodeEnter.get(event.getClickedBlock().getLocation()).length() > 3) {
                             event.getPlayer().sendMessage("Overflow.");
                             setError((Sign) event.getClickedBlock().getState(),
                                 event.getPlayer(), "Overflow");
-                            plugin.CodeEnter.put(event.getClickedBlock()
-                                                      .getLocation(), (double) 0);
-                            Sternchen(0.0,
-                                (Sign) event.getClickedBlock().getState());
+                            plugin.CodeEnter.put(event.getClickedBlock().getLocation(), "");
+                            Sternchen("",(Sign) event.getClickedBlock().getState());
                         } else {
-                            plugin.CodeEnter.put(event.getClickedBlock()
-                                                      .getLocation(),
-                                (plugin.CodeEnter.get(
-                                    event.getClickedBlock().getLocation()) * 10) +
-                                Integer.parseInt("" + Result));
+                            plugin.CodeEnter.put(event.getClickedBlock().getLocation(),plugin.CodeEnter.get(event.getClickedBlock().getLocation()) + Result);
                         }
                     } else {
-                        plugin.CodeEnter.put(event.getClickedBlock()
-                                                  .getLocation(),
-                            (double) Integer.parseInt("" + Result));
+                        plugin.CodeEnter.put(event.getClickedBlock().getLocation(),""+Result);
                     }
 
                     Sternchen(plugin.CodeEnter.get(event.getClickedBlock()
                                                         .getLocation()),
                         (Sign) event.getClickedBlock().getState());
                 } else if (Result == 'R') {
-                    if (plugin.CodeEnter.containsKey(event.getClickedBlock()
-                                                              .getLocation())) {
-                        plugin.CodeEnter.put(event.getClickedBlock()
-                                                  .getLocation(),
-                            (double) ((int) (plugin.CodeEnter.get(
-                                event.getClickedBlock().getLocation()) / 10)));
-                        Sternchen(plugin.CodeEnter.get(
-                                event.getClickedBlock().getLocation()),
-                            (Sign) event.getClickedBlock().getState());
+                    if (plugin.CodeEnter.containsKey(event.getClickedBlock().getLocation())) {
+                    	String New = "";
+                    	for(int i=0;i<plugin.CodeEnter.get(event.getClickedBlock().getLocation()).length()-1;i++){
+                    		New += plugin.CodeEnter.get(event.getClickedBlock().getLocation()).charAt(i);
+                    	}
+                        plugin.CodeEnter.put(event.getClickedBlock().getLocation(),New);
+                        Sternchen(New,(Sign) event.getClickedBlock().getState());
                     }
                 } else if (Result == 'K') {
                     if (plugin.CodeEnter.containsKey(event.getClickedBlock()
                                                               .getLocation())) {
-                        MD5 md5 = new MD5(plugin.CodeEnter.get(
-                                    event.getClickedBlock().getLocation()));
+                        MD5 md5 = new MD5(plugin.CodeEnter.get(event.getClickedBlock().getLocation()));
 
                         if (!md5.isGen()) {
                             event.getPlayer().sendMessage("Internal Error (MD5)");
@@ -449,10 +431,16 @@ public class CodePadPlayerListener extends PlayerListener {
 
                             return;
                         }
+                        
+                        MD5 md5b = new MD5(md5.getValue());
 
-                        if (((String) plugin.getSetting(
-                                    event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(
-                                    md5.getValue())) {
+                        if (!md5b.isGen()) {
+                            event.getPlayer().sendMessage("Internal Error (MD5)");
+                            setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
+
+                            return;
+                        }
+                        if (((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5.getValue()) || ((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5b.getValue())) {
                             Sign sign = (Sign) event.getClickedBlock().getState();
                             Block block = event.getClickedBlock().getWorld()
                                                .getBlockAt((Location) plugin.getSetting(
@@ -492,9 +480,8 @@ public class CodePadPlayerListener extends PlayerListener {
                             event.getPlayer(), "WrongCode");
                     }
 
-                    plugin.CodeEnter.put(event.getClickedBlock().getLocation(),
-                        (double) 0);
-                    Sternchen(0.0, (Sign) event.getClickedBlock().getState());
+                    plugin.CodeEnter.put(event.getClickedBlock().getLocation(),"");
+                    Sternchen("", (Sign) event.getClickedBlock().getState());
                 }
             }
         }
