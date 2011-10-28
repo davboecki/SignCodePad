@@ -9,9 +9,12 @@ permissions:
     description: All commands
     children:
       SignCodePad.masterdestroy: true
+      SignCodePad.replaceblock: true
       SignCodePad.use: true
       SignCodePad.create: true
   SignCodePad.masterdestroy:
+    default: op
+  SignCodePad.replaceblock:
     default: op
   SignCodePad.use:
     default: false

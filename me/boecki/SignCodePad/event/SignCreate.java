@@ -24,7 +24,7 @@ public class SignCreate extends BlockListener {
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getTypeId() == Material.WALL_SIGN.getId()) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
-            	if(plugin.getSetting(event.getBlock().getLocation(), "Owner") == event.getPlayer() || plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
+            	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
                 plugin.removeSetting(event.getBlock().getLocation());
                 event.getPlayer().sendMessage("CodePad Destroyed.");
                 plugin.save();
