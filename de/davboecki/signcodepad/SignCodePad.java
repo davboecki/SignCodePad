@@ -1,19 +1,23 @@
-package me.boecki.SignCodePad;
+package de.davboecki.signcodepad;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import me.boecki.SignCodePad.event.CalSaver;
-import me.boecki.SignCodePad.event.SignCreate;
-import me.boecki.SignCodePad.yaml.MyYamlConstructor;
+import de.davboecki.signcodepad.event.CalSaver;
+import de.davboecki.signcodepad.event.SignCreate;
+import de.davboecki.signcodepad.yaml.MyYamlConstructor;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -24,10 +28,11 @@ import org.yaml.snakeyaml.reader.UnicodeReader;
 
 
 public class SignCodePad extends JavaPlugin {
-    public HashMap<Location, String> CodeEnter = new HashMap<Location, String>();
+	public HashMap<Location, String> CodeEnter = new HashMap<Location, String>();
     public HashMap<Location, Double> EnterTimeout = new HashMap<Location, Double>();
     public HashMap<Location, Integer> ErrorCount = new HashMap<Location, Integer>();
     public HashMap<String,SignLoc> CalLoc = new HashMap<String,SignLoc>();
+    public HashMap<String,CalTypes> CalType = new HashMap<String,CalTypes>();
     public HashMap<String,CalSaver> CalSaverList = new HashMap<String,CalSaver>();
     public Settings Settings = new Settings();
     public CalibrationSettings CalibrationSettings = new CalibrationSettings();
@@ -36,8 +41,9 @@ public class SignCodePad extends JavaPlugin {
     Logger log = Logger.getLogger("Minecraft");
     Yaml yaml;
     Yaml yaml_b;
-
+    
     public Location getLocation(SignLoc loc) {
+    	if(this.getServer().getWorld(loc.world) == null)return null;
         return new Location(this.getServer().getWorld(loc.world), loc.x, loc.y,
             loc.z);
     }
@@ -97,6 +103,60 @@ public class SignCodePad extends JavaPlugin {
     	return player.hasPermission(node) || player.isOp();
     }
     
+    private void Correct_Path(String file){
+        String s;
+        String Filecontent = "";
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(getDataFolder().getPath() + file)));
+
+            try {
+                while (null != (s = in.readLine())) {
+                	Filecontent += s+"\n";
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (FileNotFoundException ex) {}
+        String[] FileSplit = Filecontent.split("me.boecki.SignCodePad");
+        Filecontent = "";
+        for(String Part: FileSplit){
+        	if(Filecontent != "")
+        		Filecontent += "de.davboecki.signcodepad";
+        	Filecontent += Part;
+        }
+        BufferedWriter out;
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(getDataFolder().getPath() + file)));
+
+            try {
+            	for(String Part: Filecontent.split("\n")){
+            		out.write(Part, 0, Part.length());
+            		out.newLine();
+            	}
+            } catch (IOException ex) {
+                System.out.println(ex);
+            } finally {
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {}
+    }
+    
     public void onEnable() {
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_INTERACT, CodePadPlayerListener,
@@ -118,7 +178,7 @@ public class SignCodePad extends JavaPlugin {
 
         SettingsSave SettingsSave = new SettingsSave(null);
         SettingsSave.Settings = new HashMap<SignLoc, HashMap<String, Object>>();
-
+        Correct_Path("/Signs.yml");
         try {
             pFile = new FileInputStream(new File(getDataFolder().getPath() +
                         "/Signs.yml"));
@@ -135,16 +195,17 @@ public class SignCodePad extends JavaPlugin {
         if (SettingsSave.Settings != null) {
             for (Object locObject : SettingsSave.Settings.keySet()) {
             	SignLoc loc = new SignLoc(locObject);
+            	boolean Valid = true;
                 for (String key : SettingsSave.Settings.get(locObject).keySet()) {
                     if (SettingsSave.Settings.get(locObject).get(key).getClass() == SignLoc.class) {
-                        SettingsSave.Settings.get(locObject)
-                                             .put(key,
-                            getLocation(
-                                (SignLoc) SettingsSave.Settings.get(locObject).get(key)));
+                    	if(getLocation((SignLoc) SettingsSave.Settings.get(locObject).get(key)) == null){Valid = false;break;}
+                        SettingsSave.Settings.get(locObject).put(key,getLocation((SignLoc) SettingsSave.Settings.get(locObject).get(key)));
                     }
                 }
-
-                Settings.put(getLocation(loc), (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
+                Location LocationLoc = getLocation(loc);
+                if(LocationLoc != null && Valid && LocationLoc.getBlock().getTypeId() == Material.WALL_SIGN.getId()){
+                	Settings.put(LocationLoc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
+                }
             }
         }
 
@@ -157,6 +218,7 @@ public class SignCodePad extends JavaPlugin {
 
         FileInputStream pFile_b;
 
+        Correct_Path("/Calibration.yml");
         try {
             pFile = new FileInputStream(new File(getDataFolder().getPath() +
                         "/Calibration.yml"));
@@ -179,7 +241,8 @@ public class SignCodePad extends JavaPlugin {
         	}
         	CalibrationSettings.CalibrationList = newCalibrationList;
         }
-        log.info("SignCodePad plugin Enabled.");
+        save();
+        log.info("[SignCodePad] v"+this.getDescription().getVersion()+" enabled.");
     }
 
     public void save() {
@@ -189,13 +252,9 @@ public class SignCodePad extends JavaPlugin {
         for (Location loc : Settings.keySet()) {
             for (String key : Settings.Settings.get(loc).keySet()) {
                 if (Settings.Settings.get(loc).get(key).getClass() == Location.class) {
-                    Settings.Settings.get(loc)
-                                     .put(key,
-                        new SignLoc((Location) Settings.Settings.get(loc)
-                                                                .get(key)));
+                    Settings.Settings.get(loc).put(key,new SignLoc((Location) Settings.Settings.get(loc).get(key)));
                 }
             }
-
             SettingsSave.Settings.put(new SignLoc(loc), Settings.get(loc));
         }
 

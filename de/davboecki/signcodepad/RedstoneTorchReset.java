@@ -1,4 +1,4 @@
-package me.boecki.SignCodePad;
+package de.davboecki.signcodepad;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,7 +15,11 @@ public class RedstoneTorchReset extends Reseter{
 	}
 
 	public void reset(){
-		block.setTypeId(Material.TORCH.getId());
+		if(block.getTypeId() == Material.REDSTONE_TORCH_ON.getId()){
+			block.setTypeId(Material.TORCH.getId());
+		} else {
+			player.sendMessage("No torch to change.");
+		}
 		sign.setLine(0,"1 2 3 |       ");
 		sign.update();
 	}

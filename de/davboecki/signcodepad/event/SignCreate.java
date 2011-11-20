@@ -1,8 +1,9 @@
-package me.boecki.SignCodePad.event;
+package de.davboecki.signcodepad.event;
 
-import me.boecki.SignCodePad.MD5;
-import me.boecki.SignCodePad.SignCodePad;
-import me.boecki.SignCodePad.SignLoc;
+import de.davboecki.signcodepad.CalTypes;
+import de.davboecki.signcodepad.MD5;
+import de.davboecki.signcodepad.SignCodePad;
+import de.davboecki.signcodepad.SignLoc;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -96,13 +97,21 @@ public class SignCreate extends BlockListener {
                     new ItemStack(Material.SIGN, 1));
         		return;
         	}
-            if (event.getLine(1).equalsIgnoreCase("Cal")) {
+        	if (event.getLine(1).equalsIgnoreCase("Cal") && event.getLine(2).equalsIgnoreCase("")) {
             	plugin.CalLoc.put(event.getPlayer().getName(), new SignLoc(event.getBlock().getLocation()));
             	plugin.CalSaverList.put(event.getPlayer().getName(), new CalSaver());
                 event.setLine(0, "+              ");
                 event.setLine(1, "Press the");
                 event.setLine(2, "cross");
                 event.setLine(3, "");
+            } else if (event.getLine(1).equalsIgnoreCase("CalA") || (event.getLine(1).equalsIgnoreCase("Cal") && event.getLine(2).equalsIgnoreCase("Advanced"))) {
+            	plugin.CalLoc.put(event.getPlayer().getName(), new SignLoc(event.getBlock().getLocation()));
+            	plugin.CalType.put(event.getPlayer().getName(), CalTypes.Advanced);
+            	plugin.CalSaverList.put(event.getPlayer().getName(), new CalSaver());
+                event.setLine(0, "Press the");
+                event.setLine(1, "crosses");
+                event.setLine(2, "Start:");
+                event.setLine(3, "+-");
             } else {
             	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.create")){
             		event.getPlayer().sendMessage("You do not have Permission to do that.");

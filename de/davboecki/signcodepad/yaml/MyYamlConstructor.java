@@ -1,11 +1,11 @@
-package me.boecki.SignCodePad.yaml;
+package de.davboecki.signcodepad.yaml;
 
 import java.util.HashMap;
 
-import me.boecki.SignCodePad.Calibration;
-import me.boecki.SignCodePad.CalibrationSettings;
-import me.boecki.SignCodePad.SettingsSave;
-import me.boecki.SignCodePad.SignLoc;
+import de.davboecki.signcodepad.Calibration;
+import de.davboecki.signcodepad.CalibrationSettings;
+import de.davboecki.signcodepad.SettingsSave;
+import de.davboecki.signcodepad.SignLoc;
 
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;

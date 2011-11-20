@@ -1,4 +1,4 @@
-package me.boecki.SignCodePad;
+package de.davboecki.signcodepad;
 
 import java.util.Date;
 

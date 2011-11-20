@@ -1,8 +1,8 @@
-package me.boecki.SignCodePad.event;
+package de.davboecki.signcodepad.event;
 
 import java.util.HashMap;
 
-import me.boecki.SignCodePad.SignLoc;
+import de.davboecki.signcodepad.SignLoc;
 
 public class CalSaver {
 	CalSaver(){	};

@@ -1,4 +1,4 @@
-package me.boecki.SignCodePad;
+package de.davboecki.signcodepad;
 
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
