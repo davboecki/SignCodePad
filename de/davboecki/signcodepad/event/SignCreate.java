@@ -154,26 +154,30 @@ public class SignCreate extends BlockListener {
                 }
                 
                 if(Worked)
-                	for(int i=0;i<4;i++){
-                		switch(Code.charAt(i)){
-	            			case '0':
-	            			case '1':
-	            			case '2':
-	            			case '3':
-	            			case '4':
-	            			case '5':
-	            			case '6':
-	            			case '7':
-	            			case '8':
-	            			case '9':
-	            			case '*':
-	            			case '#':
-	            				break;
-	            			default:
-	            				Worked = false;
-	            		}
-	            	}
-            
+                	if (Code.length() == 4) {
+	                	for(int i=0;i<4;i++){
+	                		switch(Code.charAt(i)){
+		            			case '0':
+		            			case '1':
+		            			case '2':
+		            			case '3':
+		            			case '4':
+		            			case '5':
+		            			case '6':
+		            			case '7':
+		            			case '8':
+		            			case '9':
+		            			case '*':
+		            			case '#':
+		            				break;
+		            			default:
+		            				Worked = false;
+		            		}
+		            	}
+                	} else {
+                        event.getPlayer().sendMessage("Wrong Code.");
+                        return;
+                    }
                 if (Worked) {
                     if (Code.length() == 4) {
                     	
