@@ -325,6 +325,6 @@ public class SignCodePad extends JavaPlugin {
 
     public void onDisable() {
         save();
-        log.info("SignCodePad plugin Disabled.");
+        log.info("[SignCodePad] plugin Disabled.");
     }
 }

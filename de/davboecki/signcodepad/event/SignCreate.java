@@ -35,9 +35,32 @@ public class SignCreate extends BlockListener {
             		event.setCancelled(true);
             	}
             }
+        } else {
+        	if(isSignOnBlock(event.getBlock()) && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
+        		event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+        		event.setCancelled(true);
+        	}
         }
     }
-
+    
+    private boolean isSignOnBlock(Block block){
+    	Location loc = block.getLocation();
+    	Block b;
+        if((b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+        	if(((Sign)b.getState()).getRawData() == 5)
+        		return true; 
+        if((b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+            if(((Sign)b.getState()).getRawData() == 4)
+            	return true;
+        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+            if(((Sign)b.getState()).getRawData() == 3)
+            	return true;
+        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+            if(((Sign)b.getState()).getRawData() == 2)
+            	return true;
+    	return false;
+    }
+    
     private Block getBlockBehind(Sign sign) {
         Location signloc = sign.getBlock().getLocation();
         double x = -1;
