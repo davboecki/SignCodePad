@@ -36,9 +36,11 @@ public class SignCreate extends BlockListener {
             	}
             }
         } else {
-        	if(isSignOnBlock(event.getBlock()) && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
-        		event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-        		event.setCancelled(true);
+        	if (plugin.hasSetting(event.getBlock().getLocation())) {
+                if(isSignOnBlock(event.getBlock()) && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
+                	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                	event.setCancelled(true);
+                }
         	}
         }
     }
