@@ -389,8 +389,6 @@ public class CodePadPlayerListener extends PlayerListener {
             		event.getPlayer().sendMessage("Done.");
             		plugin.save();
             	}
-            }
-            if(SignCharList[Calsave.CalNumber] == 'X'){
                 sign.getBlock().setType(Material.AIR);
                 sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.SIGN, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());

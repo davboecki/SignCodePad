@@ -52,9 +52,10 @@ public class SignCodePad extends JavaPlugin {
     }
 
     public World getWorld(String worldname) {
-    	for(World world : (World[])this.getServer().getWorlds().toArray()){
-    		if(world.getName().equalsIgnoreCase(worldname)){
-    			return world;
+    	for(Object world : this.getServer().getWorlds().toArray()){
+    		if(!(world instanceof World))continue;
+    		if(((World)world).getName().equalsIgnoreCase(worldname)){
+    			return ((World)world);
     		}
     	}
     	return null;
