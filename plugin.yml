@@ -20,3 +20,18 @@ permissions:
     default: false
   SignCodePad.create:
     default: false
+  signcodepad.*:
+    description: All commands
+    children:
+      signcodepad.masterdestroy: true
+      signcodepad.replaceblock: true
+      signcodepad.use: true
+      signcodepad.create: true
+  signcodepad.masterdestroy:
+    default: op
+  signcodepad.replaceblock:
+    default: op
+  signcodepad.use:
+    default: false
+  signcodepad.create:
+    default: false

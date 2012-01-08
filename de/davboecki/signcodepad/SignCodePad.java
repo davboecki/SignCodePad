@@ -18,6 +18,7 @@ import de.davboecki.signcodepad.yaml.MyYamlConstructor;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -41,11 +42,22 @@ public class SignCodePad extends JavaPlugin {
     Logger log = Logger.getLogger("Minecraft");
     Yaml yaml;
     Yaml yaml_b;
-    
+
     public Location getLocation(SignLoc loc) {
-    	if(this.getServer().getWorld(loc.world) == null)return null;
-        return new Location(this.getServer().getWorld(loc.world), loc.x, loc.y,
-            loc.z);
+    	if(getWorld(loc.world) == null){
+    		log.severe("[SignCodePad] Could not find world: '"+loc.world+"'. CodePad-entry will be removed.");
+    		return null;
+    	}
+        return new Location(getWorld(loc.world), loc.x, loc.y, loc.z);
+    }
+
+    public World getWorld(String worldname) {
+    	for(World world : (World[])this.getServer().getWorlds().toArray()){
+    		if(world.getName().equalsIgnoreCase(worldname)){
+    			return world;
+    		}
+    	}
+    	return null;
     }
 
     public void setSetting(Location loc, String key, Object value) {
@@ -100,7 +112,7 @@ public class SignCodePad extends JavaPlugin {
     }
     
     public boolean hasPermission(Player player, String node){
-    	return player.hasPermission(node) || player.isOp();
+    	return player.hasPermission(node) || player.isOp() || player.hasPermission(node.toLowerCase());
     }
     
     private void Correct_Path(String file){
@@ -242,6 +254,9 @@ public class SignCodePad extends JavaPlugin {
         	CalibrationSettings.CalibrationList = newCalibrationList;
         }
         save();
+        
+        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BlockChangerTask(), 1, 1);
+        
         log.info("[SignCodePad] v"+this.getDescription().getVersion()+" enabled.");
     }
 
