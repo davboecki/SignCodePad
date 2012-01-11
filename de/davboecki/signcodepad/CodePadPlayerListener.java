@@ -364,7 +364,7 @@ public class CodePadPlayerListener extends PlayerListener {
 				    	} else if(SignCharList[Calsave.CalNumber] == 'B') {
 				    		SignLoc parta = s.get(event.getPlayer().getName());
 				    		d.put(event.getPlayer().getName(), ((x - parta.x)/0.065));
-				    		event.getPlayer().sendMessage("D: "+((x - parta.x)/0.065));
+				    		//event.getPlayer().sendMessage("D: "+((x - parta.x)/0.065));
 				    	}
 					}
 		            Calsave.CalNumber++;
