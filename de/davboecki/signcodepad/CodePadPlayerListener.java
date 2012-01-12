@@ -27,7 +27,7 @@ public class CodePadPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         
         if (!plugin.CalibrationSettings.CalibrationList.containsKey(
-                    player.getName()) && plugin.hasPermission(event.getPlayer(), "SignCodePad.use")) {
+                    player.getName()) && plugin.hasPermission(event.getPlayer(), "signcodepad.use")) {
             new CalNoteThread(player).start();
         }
     }
@@ -322,7 +322,7 @@ public class CodePadPlayerListener extends PlayerListener {
     }
     
     private void handleCalSignAdvanced(PlayerInteractEvent event){
-    	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.use")){
+    	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
     		event.getPlayer().sendMessage("You do not have Permission to do that.");
     		return;
     	}
@@ -441,7 +441,7 @@ public class CodePadPlayerListener extends PlayerListener {
     }
 	
     private void handleCalSignNormal(PlayerInteractEvent event){
-		if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.use")){
+		if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
     		event.getPlayer().sendMessage("You do not have Permission to do that.");
     		return;
     	}
@@ -501,7 +501,7 @@ public class CodePadPlayerListener extends PlayerListener {
 	}
 	
     private void handleCodeEnter(PlayerInteractEvent event){
-    	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.use")){
+    	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
     		event.getPlayer().sendMessage("You do not have Permission to do that.");
     		return;
     	}

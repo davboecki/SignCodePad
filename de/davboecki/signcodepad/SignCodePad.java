@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import de.davboecki.signcodepad.event.CalSaver;
@@ -29,6 +30,9 @@ import org.yaml.snakeyaml.reader.UnicodeReader;
 
 
 public class SignCodePad extends JavaPlugin {
+	
+	private static SignCodePad instance = null;
+	
 	public HashMap<Location, String> CodeEnter = new HashMap<Location, String>();
     public HashMap<Location, Double> EnterTimeout = new HashMap<Location, Double>();
     public HashMap<Location, Integer> ErrorCount = new HashMap<Location, Integer>();
@@ -112,8 +116,8 @@ public class SignCodePad extends JavaPlugin {
         }
     }
     
-    public boolean hasPermission(Player player, String node){
-    	return player.hasPermission(node) || player.isOp() || player.hasPermission(node.toLowerCase());
+    public boolean hasPermission(Player player, String node) {
+    	return player.hasPermission(node) || player.isOp();
     }
     
     private void Correct_Path(String file){
@@ -256,7 +260,7 @@ public class SignCodePad extends JavaPlugin {
         }
         save();
         
-        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BlockChangerTask(), 1, 1);
+        //this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BlockChangerTask(), 1, 1);
         
         log.info("[SignCodePad] v"+this.getDescription().getVersion()+" enabled.");
     }
@@ -338,7 +342,15 @@ public class SignCodePad extends JavaPlugin {
             }
         }
     }
-
+    
+    public SignCodePad(){
+    	instance = this;
+    }
+    
+    public static SignCodePad getInstance(){
+    	return instance;
+    }
+    
     public void onDisable() {
         save();
         log.info("[SignCodePad] plugin Disabled.");

@@ -25,7 +25,7 @@ public class SignCreate extends BlockListener {
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getTypeId() == Material.WALL_SIGN.getId()) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
-            	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
+            	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
                 plugin.removeSetting(event.getBlock().getLocation());
                 event.getPlayer().sendMessage("CodePad Destroyed.");
                 plugin.save();
@@ -114,7 +114,7 @@ public class SignCreate extends BlockListener {
     	}
     	if (event.getBlock().getTypeId() != Material.WALL_SIGN.getId()) return;
     	 if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
-        	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.use")){
+        	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
         		event.getBlock().setType(Material.AIR);
                 event.getBlock().getLocation().getWorld()
@@ -138,7 +138,7 @@ public class SignCreate extends BlockListener {
                 event.setLine(2, "Start:");
                 event.setLine(3, "+-");
             } else {
-            	if(!plugin.hasPermission(event.getPlayer(), "SignCodePad.create")){
+            	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.create")){
             		event.getPlayer().sendMessage("You do not have Permission to do that.");
                     event.getBlock().setType(Material.AIR);
                     event.getBlock().getLocation().getWorld()
@@ -208,7 +208,7 @@ public class SignCreate extends BlockListener {
                          event.setLine(2, "7 8 9 |  <<- ");
                          event.setLine(3, "* 0 # |  OK  ");
                          Block block = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location"));
-                         if(block.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"SignCodePad.replaceblock")){
+                         if(block.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
                         	event.getPlayer().sendMessage("OK-Target not air.");
                         	if (plugin.hasSetting(event.getBlock().getLocation())) {
                         		plugin.removeSetting(event.getBlock().getLocation());
@@ -219,7 +219,7 @@ public class SignCreate extends BlockListener {
                          block.setTypeId(Material.TORCH.getId());
                          if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
                         	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
-                        	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"SignCodePad.replaceblock")){
+                        	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
                         		 event.getPlayer().sendMessage("Error-Target not air.");
                         		 if (plugin.hasSetting(event.getBlock().getLocation())) {
                         			 plugin.removeSetting(event.getBlock().getLocation());

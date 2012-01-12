@@ -17,6 +17,7 @@ public class RedstoneTorchReset extends Reseter{
 	public void reset(){
 		if(block.getTypeId() == Material.REDSTONE_TORCH_ON.getId()){
 			BlockChangerTask.Blocks.add(block);
+			SignCodePad.getInstance().getServer().getScheduler().callSyncMethod(SignCodePad.getInstance(), new BlockChangerTask());
 		} else {
 			player.sendMessage("No torch to change.");
 		}
