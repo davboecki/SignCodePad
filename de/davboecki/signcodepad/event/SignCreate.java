@@ -9,19 +9,21 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
 
-public class SignCreate extends BlockListener {
+public class SignCreate implements Listener {
     SignCodePad plugin;
     
     public SignCreate(SignCodePad pplugin) {
         plugin = pplugin;
     }
 
+    @EventHandler()
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getTypeId() == Material.WALL_SIGN.getId()) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
@@ -103,6 +105,7 @@ public class SignCreate extends BlockListener {
                    .getBlockAt(new Location(sign.getBlock().getWorld(), x, y, z));
     }
 
+    @EventHandler()
     public void onSignChange(SignChangeEvent event) {
     	if (event.getBlock().getTypeId() == Material.SIGN_POST.getId()){
     		if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {

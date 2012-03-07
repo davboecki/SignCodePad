@@ -12,17 +12,20 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 
 
-public class CodePadPlayerListener extends PlayerListener {
+public class CodePadPlayerListener implements Listener {
     SignCodePad plugin;
 
     CodePadPlayerListener(SignCodePad pplugin) {
         plugin = pplugin;
     }
-
+    
+    @EventHandler()
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
@@ -232,6 +235,7 @@ public class CodePadPlayerListener extends PlayerListener {
         }
     }
 
+    @EventHandler()
     public void onPlayerInteract(PlayerInteractEvent event) {
     	if(event.getClickedBlock() == null) return;
         if (event.getClickedBlock().getTypeId() == Material.WALL_SIGN.getId()) {

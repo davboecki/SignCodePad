@@ -183,11 +183,9 @@ public class SignCodePad extends JavaPlugin {
     
     public void onEnable() {
         PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, CodePadPlayerListener, Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.PLAYER_JOIN, CodePadPlayerListener, Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.SIGN_CHANGE, SignCreate, Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.BLOCK_BREAK, SignCreate, Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.WORLD_LOAD, WorldListener, Event.Priority.Normal, this);
+        pm.registerEvents(CodePadPlayerListener, this);
+        pm.registerEvents(SignCreate,this);
+        pm.registerEvents(WorldListener, this);
 
         MyYamlConstructor cstr = new MyYamlConstructor(SettingsSave.class);
         TypeDescription pDesc = new TypeDescription(SettingsSave.class);

@@ -4,20 +4,22 @@ import java.util.HashMap;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.event.world.WorldListener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 
 import de.davboecki.signcodepad.SignCodePad;
 import de.davboecki.signcodepad.SignLoc;
 
-public class WorldLoadListener extends WorldListener {
+public class WorldLoadListener implements Listener {
 	
 	SignCodePad plugin;
 	
 	public WorldLoadListener(SignCodePad instance){
 		plugin = instance;
 	}
-	
+
+    @EventHandler()
 	public void onWorldLoad(WorldLoadEvent worldloadevent)
     {
 		for (SignLoc loc : plugin.RemovedSigns.keySet()) {
