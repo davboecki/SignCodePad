@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import de.davboecki.signcodepad.event.CalSaver;
 import de.davboecki.signcodepad.event.SignCreate;
+import de.davboecki.signcodepad.event.WorldLoadListener;
 import de.davboecki.signcodepad.yaml.MyYamlConstructor;
 
 import org.bukkit.Location;
@@ -40,19 +41,25 @@ public class SignCodePad extends JavaPlugin {
     public HashMap<String,CalTypes> CalType = new HashMap<String,CalTypes>();
     public HashMap<String,CalSaver> CalSaverList = new HashMap<String,CalSaver>();
     public Settings Settings = new Settings();
+    public HashMap<SignLoc, HashMap<String, Object>> RemovedSigns = new HashMap<SignLoc, HashMap<String, Object>>();
     public CalibrationSettings CalibrationSettings = new CalibrationSettings();
+    private final WorldLoadListener WorldListener = new WorldLoadListener(this);
     private final CodePadPlayerListener CodePadPlayerListener = new CodePadPlayerListener(this);
     private final SignCreate SignCreate = new SignCreate(this);
     Logger log = Logger.getLogger("Minecraft");
     Yaml yaml;
     Yaml yaml_b;
 
-    public Location getLocation(SignLoc loc) {
+    public Location getLocation(SignLoc loc,boolean flag) {
     	if(getWorld(loc.world) == null){
-    		log.severe("[SignCodePad] Could not find world: '"+loc.world+"'. CodePad-entry will be removed.");
+    		if(flag)log.severe("[SignCodePad] Could not find world: '"+loc.world+"'. CodePad-entry will be removed.");
     		return null;
     	}
         return new Location(getWorld(loc.world), loc.x, loc.y, loc.z);
+    }
+
+    public Location getLocation(SignLoc loc) {
+    	return getLocation(loc,true);
     }
 
     public World getWorld(String worldname) {
@@ -176,14 +183,11 @@ public class SignCodePad extends JavaPlugin {
     
     public void onEnable() {
         PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, CodePadPlayerListener,
-                Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.PLAYER_JOIN, CodePadPlayerListener,
-                Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.SIGN_CHANGE, SignCreate,
-            Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.BLOCK_BREAK, SignCreate,
-            Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, CodePadPlayerListener, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_JOIN, CodePadPlayerListener, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.SIGN_CHANGE, SignCreate, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.BLOCK_BREAK, SignCreate, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.WORLD_LOAD, WorldListener, Event.Priority.Normal, this);
 
         MyYamlConstructor cstr = new MyYamlConstructor(SettingsSave.class);
         TypeDescription pDesc = new TypeDescription(SettingsSave.class);
@@ -222,6 +226,8 @@ public class SignCodePad extends JavaPlugin {
                 Location LocationLoc = getLocation(loc);
                 if(LocationLoc != null && Valid && LocationLoc.getBlock().getTypeId() == Material.WALL_SIGN.getId()){
                 	Settings.put(LocationLoc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
+                } else {
+                	RemovedSigns.put(loc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
                 }
             }
         }
