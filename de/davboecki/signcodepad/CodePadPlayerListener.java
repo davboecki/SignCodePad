@@ -5,11 +5,24 @@ import java.util.HashMap;
 
 import de.davboecki.signcodepad.event.CalSaver;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.Packet100OpenWindow;
+import net.minecraft.server.TileEntity;
+import net.minecraft.server.TileEntitySign;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftChest;
+import org.bukkit.craftbukkit.block.CraftSign;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.Listener;
@@ -20,6 +33,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class CodePadPlayerListener implements Listener {
     SignCodePad plugin;
+    
+    private boolean isLocalInteract = false;
 
     CodePadPlayerListener(SignCodePad pplugin) {
         plugin = pplugin;
@@ -190,7 +205,7 @@ public class CodePadPlayerListener implements Listener {
         sign.setLine(1, Line.toString());
         sign.setLine(2, "7 8 9 |  <<- ");
         sign.setLine(3, "* 0 # |  OK  ");
-        sign.update();
+        sign.update(true);
     }
 
     private void setError(Sign sign, Player player, String Type) {
@@ -238,6 +253,7 @@ public class CodePadPlayerListener implements Listener {
     @EventHandler()
     public void onPlayerInteract(PlayerInteractEvent event) {
     	if(event.getClickedBlock() == null) return;
+    	if(isLocalInteract) return;
         if (event.getClickedBlock().getTypeId() == Material.WALL_SIGN.getId()) {
             if (plugin.CalLoc.containsKey(event.getPlayer().getName())) {
             	if(plugin.CalType.containsKey(event.getPlayer().getName())){
@@ -255,6 +271,14 @@ public class CodePadPlayerListener implements Listener {
             if (plugin.hasSetting(event.getClickedBlock().getLocation())) {
             	handleCodeEnter(event);
             }
+        } else { //if(event.getClickedBlock().getTypeId() == Material.CHEST.getId()) 
+        	if(plugin.isLockedBlock(event.getClickedBlock())){
+        		event.setCancelled(true);
+        	} else if (plugin.getNearChest(event.getClickedBlock()) != null) {
+        		if(plugin.isLockedBlock(plugin.getNearChest(event.getClickedBlock()))) {
+            		event.setCancelled(true);
+        		}
+        	}
         }
     }
     
@@ -564,35 +588,76 @@ public class CodePadPlayerListener implements Listener {
                     return;
                 }
                 if (((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5.getValue()) || ((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5b.getValue())) {
-                    Sign sign = (Sign) event.getClickedBlock().getState();
-                    Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Location"));
-                    
-                    if(block.getTypeId() == Material.TORCH.getId()){
-                    	block.setTypeId(Material.REDSTONE_TORCH_ON.getId());
-
-                    } else {
-                    	event.getPlayer().sendMessage("No torch to change.");
-                    }
-                    
-                    sign.setLine(0, "1 2 3 |  §aOK  ");
-                    
-                	try {
-                        new RedstoneTorchReset(block, (int) (Double.parseDouble((String) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
-                    } catch (ClassCastException e) {
-                        try {
-                            new RedstoneTorchReset(block,(int) (((Double) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
-                        } catch (ClassCastException ex) {
-                            new RedstoneTorchReset(block,(int) (((Integer) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
-                        }
-                    }
+                	if(plugin.hasSetting(event.getClickedBlock().getLocation(), "Block")) {
+                		HandleBlockPad(event);
+                	} else {
+                		HandleTorchPad(event);
+                	}
                 } else {
-                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "WrongCode");
+                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "Wrong code");
                 }
             } else {
-                setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "WrongCode");
+                setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "Wrong code");
             }
             plugin.CodeEnter.put(event.getClickedBlock().getLocation(),"");
             Sternchen("", (Sign) event.getClickedBlock().getState());
         }
+    }
+
+    private void HandleTorchPad(PlayerInteractEvent event) {
+        Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Location"));
+        
+        if(block.getTypeId() == Material.TORCH.getId()){
+        	block.setTypeId(Material.REDSTONE_TORCH_ON.getId());
+
+        } else {
+        	event.getPlayer().sendMessage("No torch to change.");
+        }
+
+    	Sign sign = (Sign) event.getClickedBlock().getState();
+        sign.setLine(0, "1 2 3 |  §aOK  ");
+        sign.update();
+        
+    	try {
+            new RedstoneTorchReset(block, (int) (Double.parseDouble((String) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+        } catch (ClassCastException e) {
+            try {
+                new RedstoneTorchReset(block,(int) (((Double) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+            } catch (ClassCastException ex) {
+                new RedstoneTorchReset(block,(int) (((Integer) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+            }
+        }
+    }
+    
+    private void HandleBlockPad(PlayerInteractEvent event) {
+    	Sign sign = (Sign) event.getClickedBlock().getState();
+        Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"Block"));
+        
+        byte data = event.getClickedBlock().getData();
+        
+        //event.getClickedBlock().setTypeId(0);
+        
+        isLocalInteract = true;
+        PlayerInteractEvent interactevent = new PlayerInteractEvent(event.getPlayer(), Action.RIGHT_CLICK_BLOCK, event.getItem(), block, event.getBlockFace());
+        try {
+        	plugin.getServer().getPluginManager().callEvent(interactevent);
+        	if(!interactevent.isCancelled()) {
+        		net.minecraft.server.Block.byId[block.getTypeId()].interact(((CraftWorld)block.getWorld()).getHandle(), block.getX(), block.getY(), block.getZ(), ((CraftPlayer)event.getPlayer()).getHandle());
+        	}
+        } catch(Exception e) {
+        	event.getPlayer().sendMessage(ChatColor.RED+"Couldn't automaticly interact locked block. Please report this problem.");
+        }
+        isLocalInteract = false;
+        
+        //event.getClickedBlock().setType(Material.WALL_SIGN);
+        //event.getClickedBlock().setData(data);
+
+    	//sign = (Sign) event.getClickedBlock().getState();
+        sign.setLine(0, "1 2 3 |  §aOK  ");
+        sign.setLine(1, "4 5 6 | ----");
+        sign.setLine(2, "7 8 9 |  <<- ");
+        sign.setLine(3, "* 0 # |  OK  ");
+        sign.update();
+        new SignReseter(2000, sign, event.getPlayer()).start();
     }
 }

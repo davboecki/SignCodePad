@@ -28,7 +28,7 @@ public class MD5 {
 	        }
 	        Result = hexString.toString();
 	        Valid = true;
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 			Valid = false;
 		}

@@ -1,17 +1,30 @@
 package de.davboecki.signcodepad.event;
 
+import java.util.ArrayList;
+
 import de.davboecki.signcodepad.CalTypes;
 import de.davboecki.signcodepad.MD5;
 import de.davboecki.signcodepad.SignCodePad;
 import de.davboecki.signcodepad.SignLoc;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.Packet100OpenWindow;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.block.CraftChest;
+import org.bukkit.craftbukkit.block.CraftSign;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,14 +50,56 @@ public class SignCreate implements Listener {
             		event.setCancelled(true);
             	}
             }
-        } else {
-        	if (plugin.hasSetting(event.getBlock().getLocation())) {
-                if(isSignOnBlock(event.getBlock()) && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
-                	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-                	event.setCancelled(true);
-                }
-        	}
+        } else //if (plugin.hasSetting(event.getBlock().getLocation())) {
+            if(isSignOnBlock(event.getBlock())/* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")*/){
+              	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+               	event.setCancelled(true);
+            //}
+        } else if (plugin.isLockedBlock(event.getBlock())){
+          	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+           	event.setCancelled(true);
+        } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) {
+        	event.setCancelled(true);
+        	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+           	event.setCancelled(true);
         }
+    }
+    
+    @EventHandler()
+    public void onPhysics(BlockPhysicsEvent event) {
+    	if(isAccessDenied(event.getBlock())){
+			event.setCancelled(true);
+		}
+    }
+    
+    @EventHandler()
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+    	for(Block block:event.getBlocks()){
+    		if(isAccessDenied(block)){
+    			event.setCancelled(true);
+    			return;
+    		}
+    	}
+    }
+    
+    @EventHandler()
+    public void onPistonRetract(BlockPistonRetractEvent event){
+    	if(isAccessDenied(event.getRetractLocation().getBlock())){
+			event.setCancelled(true);
+		}
+    }
+    
+    private boolean isAccessDenied(Block block) {
+    	if(plugin.hasSetting(block.getLocation())){
+    		return true;
+    	} else if(isSignOnBlock(block)) {
+    		return true;
+    	} else if(plugin.isLockedBlock(block)){
+    		return true;
+    	} else if (plugin.getNearChest(block) != null && plugin.isLockedBlock(plugin.getNearChest(block))) {
+    		return true;
+    	}
+    	return false;
     }
     
     private boolean isSignOnBlock(Block block){
@@ -140,6 +195,162 @@ public class SignCreate implements Listener {
                 event.setLine(1, "crosses");
                 event.setLine(2, "Start:");
                 event.setLine(3, "+-");
+            } else if (event.getLine(1).equalsIgnoreCase("B") || event.getLine(1).equalsIgnoreCase("Block")){
+            	if(event.getBlock().getLocation().getY() < 1) {
+            		event.getPlayer().sendMessage("Sign is to low.");
+            		return;
+            	}
+            	Location loc = event.getBlock().getLocation();
+            	loc.setY(event.getBlock().getLocation().getY() - 1);
+            	ArrayList<Integer> Lockable = new ArrayList<Integer>();
+            	ArrayList<Integer> DataValueCahnge = new ArrayList<Integer>();
+            	Lockable.add(Material.CHEST.getId());
+            	Lockable.add(Material.FURNACE.getId());
+            	Lockable.add(Material.BURNING_FURNACE.getId());
+            	Lockable.add(Material.WORKBENCH.getId());
+            	Lockable.add(Material.LEVER.getId());
+            	//Lockable.add(Material.STONE_BUTTON.getId());
+            	Lockable.add(Material.DISPENSER.getId());
+            	DataValueCahnge.add(Material.CHEST.getId());
+            	DataValueCahnge.add(Material.FURNACE.getId());
+            	DataValueCahnge.add(Material.BURNING_FURNACE.getId());
+            	
+            	
+            	if(!Lockable.contains(loc.getBlock().getTypeId())) {
+            		event.getPlayer().sendMessage("No lockable block under sign.");
+            		return;
+            	}
+            	if(plugin.isLockedBlock(loc.getBlock())) {
+            		event.getPlayer().sendMessage("This block is already locked.");
+            		return;
+            	}
+            	if(plugin.getNearChest(loc.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(loc.getBlock()))) {
+            		event.getPlayer().sendMessage("This block is already locked.");
+            		return;
+            	}
+            	
+            	boolean ChangeDataValue = false;
+            	Block chest = loc.getBlock();
+
+                boolean Worked = true;
+                String Code = "";
+
+                try {
+                	Code = event.getLine(2);
+                } catch (Exception e) {
+                    Worked = false;
+                }
+                
+                if(Worked) {
+                	if (Code.length() == 4) {
+	                	for(int i=0;i<4;i++) {
+	                		switch(Code.charAt(i)) {
+		            			case '0':
+		            			case '1':
+		            			case '2':
+		            			case '3':
+		            			case '4':
+		            			case '5':
+		            			case '6':
+		            			case '7':
+		            			case '8':
+		            			case '9':
+		            			case '*':
+		            			case '#':
+		            				break;
+		            			default:
+		            				Worked = false;
+		            		}
+		            	}
+                	} else {
+                        event.getPlayer().sendMessage("Wrong Code.");
+                        return;
+                    }
+                }
+                
+                if(Worked) {
+                	MD5 md5 = new MD5(Code);
+
+                    if (!md5.isGen()) {
+                        event.getPlayer()
+                        .sendMessage("Internal Error (MD5).");
+                        return;
+                    }
+                    MD5 md5b = new MD5(md5.getValue());
+
+                    if (!md5b.isGen()) {
+                        event.getPlayer()
+                        .sendMessage("Internal Error (MD5).");
+                        return;
+                    }
+                   
+                    //event.getPlayer().sendMessage("Chest: "+chest.getData());
+                	Location signpos = chest.getLocation();
+                	if(ChangeDataValue) {
+                    	switch(chest.getData()) {
+	                		case 2:
+	                			signpos.setZ(signpos.getZ()-1);
+	                			break;
+	                		case 3:
+	                			signpos.setZ(signpos.getZ()+1);
+	                			break;
+	                		case 4:
+	                			signpos.setX(signpos.getX()-1);
+	                			break;
+	                		case 5:
+	                			signpos.setX(signpos.getX()+1);
+	                			break;
+	                	}
+                	} else {
+                    	switch(event.getBlock().getData()) {
+	                		case 2:
+	                			signpos.setZ(signpos.getZ()-1);
+	                			break;
+	                		case 3:
+	                			signpos.setZ(signpos.getZ()+1);
+	                			break;
+	                		case 4:
+	                			signpos.setX(signpos.getX()-1);
+	                			break;
+	                		case 5:
+	                			signpos.setX(signpos.getX()+1);
+	                			break;
+	                	}
+                	}
+                	Block sign = signpos.getBlock();
+                	if(sign.getTypeId() != 0) {
+                		event.getPlayer().sendMessage("[SignCodePad] The block in front of the lockable block is not air.");
+                		return;
+                	} else {
+                		event.setCancelled(true);
+                	}
+                	sign.setTypeId(Material.WALL_SIGN.getId());
+                	
+                	if(ChangeDataValue) {
+                		sign.setData(chest.getData());
+                	} else {
+                		sign.setData(event.getBlock().getData());
+                	}
+
+                    event.getBlock().setTypeId(0);
+                	
+                    plugin.setSetting(sign.getLocation(),"MD5", md5b.getValue());
+                    plugin.setSetting(sign.getLocation(), "Owner",event.getPlayer().getName());
+                    plugin.setSetting(sign.getLocation(), "Block",chest.getLocation());
+                	
+                	CraftSign cSign = (CraftSign) sign.getState();
+                	
+                	cSign.setLine(0, "1 2 3 |       ");
+                	cSign.setLine(1, "4 5 6 | ----");
+                	cSign.setLine(2, "7 8 9 |  <<- ");
+                	cSign.setLine(3, "* 0 # |  OK  ");
+                	cSign.update();
+
+                    plugin.save();
+                    event.getPlayer().sendMessage("CodePad Created.");
+                } else {
+                    event.getPlayer().sendMessage("Wrong Code.");
+                }
             } else {
             	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.create")){
             		event.getPlayer().sendMessage("You do not have Permission to do that.");
@@ -243,7 +454,7 @@ public class SignCreate implements Listener {
             }
         }
     }
-
+    
     private boolean Zeiledrei(String line, SignChangeEvent event) {
         String[] linesplit = line.split(";");
 

@@ -21,6 +21,8 @@ import de.davboecki.signcodepad.yaml.MyYamlConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -211,7 +213,7 @@ public class SignCodePad extends JavaPlugin {
             log.severe("[SignCodePad] Could not Load Sign Config.");
         }
 
-        if (SettingsSave.Settings != null) {
+        if (SettingsSave != null && SettingsSave.Settings != null) {
             for (Object locObject : SettingsSave.Settings.keySet()) {
             	SignLoc loc = new SignLoc(locObject);
             	boolean Valid = true;
@@ -222,7 +224,7 @@ public class SignCodePad extends JavaPlugin {
                     }
                 }
                 Location LocationLoc = getLocation(loc);
-                if(LocationLoc != null && Valid && LocationLoc.getBlock().getTypeId() == Material.WALL_SIGN.getId()){
+                if(LocationLoc != null && Valid && (LocationLoc.getBlock().getTypeId() == Material.WALL_SIGN.getId())){
                 	Settings.put(LocationLoc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
                 } else {
                 	RemovedSigns.put(loc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
@@ -358,5 +360,29 @@ public class SignCodePad extends JavaPlugin {
     public void onDisable() {
         save();
         log.info("[SignCodePad] plugin Disabled.");
+    }
+
+	public boolean isLockedBlock(Block clickedBlock) {
+		for(Location loc:Settings.keySet()) {
+			if(this.hasSetting(loc, "Block")) {
+				if(clickedBlock.getWorld().getName().equalsIgnoreCase(((Location)this.getSetting(loc, "Block")).getWorld().getName())) {
+					if(clickedBlock.getLocation().distance((Location)this.getSetting(loc, "Block")) == 0) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+    private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+    public Block getNearChest(Block block) {
+    	for (BlockFace face : FACES) {
+            Block other = block.getRelative(face);
+            if (other.getType() == Material.CHEST) {
+                return other;
+            }
+        }
+        return null;
     }
 }
