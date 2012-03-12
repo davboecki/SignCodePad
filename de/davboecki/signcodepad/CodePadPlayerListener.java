@@ -594,10 +594,10 @@ public class CodePadPlayerListener implements Listener {
                 		HandleTorchPad(event);
                 	}
                 } else {
-                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "Wrong code");
+                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "WrongCode");
                 }
             } else {
-                setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "Wrong code");
+                setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "WrongCode");
             }
             plugin.CodeEnter.put(event.getClickedBlock().getLocation(),"");
             Sternchen("", (Sign) event.getClickedBlock().getState());

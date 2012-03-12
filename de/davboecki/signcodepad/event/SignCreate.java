@@ -411,27 +411,32 @@ public class SignCreate implements Listener {
                             .sendMessage("Internal Error (MD5).");
                             return;
                         }
+                        try {
                         if (!Zeiledrei(event.getLine(2), event) ||
                                 !Zeilevier(event.getLine(3), event)) {
                              return;
-                         }
-                         plugin.setSetting(event.getBlock().getLocation(),"MD5", md5b.getValue());
-                         plugin.setSetting(event.getBlock().getLocation(), "Owner",event.getPlayer().getName());
-                         event.setLine(0, "1 2 3 |       ");
-                         event.setLine(1, "4 5 6 | ----");
-                         event.setLine(2, "7 8 9 |  <<- ");
-                         event.setLine(3, "* 0 # |  OK  ");
-                         Block block = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location"));
-                         if(block.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
+                        }
+                        } catch(Exception e) {
+                        	event.getPlayer().sendMessage("Error while parsing the sign. Did you enter everything correct?");
+                        	return;
+                        }
+                        plugin.setSetting(event.getBlock().getLocation(),"MD5", md5b.getValue());
+                        plugin.setSetting(event.getBlock().getLocation(), "Owner",event.getPlayer().getName());
+                        event.setLine(0, "1 2 3 |       ");
+                        event.setLine(1, "4 5 6 | ----");
+                        event.setLine(2, "7 8 9 |  <<- ");
+                        event.setLine(3, "* 0 # |  OK  ");
+                        Block block = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location"));
+                        if(block.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
                         	event.getPlayer().sendMessage("OK-Target not air.");
                         	if (plugin.hasSetting(event.getBlock().getLocation())) {
                         		plugin.removeSetting(event.getBlock().getLocation());
                         		plugin.save();
                         	}
                         	return;
-                         }
-                         block.setTypeId(Material.TORCH.getId());
-                         if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
+                        }
+                        block.setTypeId(Material.TORCH.getId());
+                        if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
                         	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
                         	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
                         		 event.getPlayer().sendMessage("Error-Target not air.");
@@ -442,9 +447,9 @@ public class SignCreate implements Listener {
                         		 return;
                         	 }
                         	 blockb.setTypeId(Material.TORCH.getId());
-                         }
-                         plugin.save();
-                         event.getPlayer().sendMessage("CodePad Created.");
+                        }
+                        plugin.save();
+                        event.getPlayer().sendMessage("CodePad Created.");
                     } else {
                         event.getPlayer().sendMessage("Wrong Code.");
                     }
@@ -455,12 +460,29 @@ public class SignCreate implements Listener {
         }
     }
     
+    private boolean isNumber(String input){
+    	try{
+    		int result = Integer.valueOf(input);
+    		if(String.valueOf(result).equalsIgnoreCase(input)){
+    			return true;
+    		} else {
+    			return false;
+    		}
+    	} catch(Exception e){
+    		return false;
+    	}
+    }
+    
     private boolean Zeiledrei(String line, SignChangeEvent event) {
         String[] linesplit = line.split(";");
 
         if (linesplit[0] != "" && linesplit[0].length()>0) {
-            plugin.setSetting(event.getBlock().getLocation(), "OK-Delay",
-                linesplit[0]);
+        	if(isNumber(linesplit[0])){
+        		plugin.setSetting(event.getBlock().getLocation(), "OK-Delay", linesplit[0]);	
+        	} else {
+        		event.getPlayer().sendMessage("Error in Line 3. (First parameter is not a number)");
+        		return false;
+        	}
         } else {
             plugin.setSetting(event.getBlock().getLocation(), "OK-Delay", 3);
         }
@@ -469,9 +491,7 @@ public class SignCreate implements Listener {
             String[] loc = linesplit[1].split(",");
 
             if (loc.length < 3) {
-                event.getPlayer()
-                     .sendMessage("Error in Line 3. (Destination Format) ("+loc.length+")");
-
+                event.getPlayer().sendMessage("Error in Line 3. (Destination Format) ("+loc.length+")");
                 return false;
             }
 
@@ -482,8 +502,7 @@ public class SignCreate implements Listener {
                 return false;
             }
 
-            Location blockloc = getBlockBehind((Sign) event.getBlock().getState())
-                                    .getLocation();
+            Location blockloc = getBlockBehind((Sign) event.getBlock().getState()).getLocation();
             double x = blockloc.getX();
             double y = blockloc.getY() + Integer.parseInt(loc[1]);
             double z = blockloc.getZ();
@@ -519,7 +538,7 @@ public class SignCreate implements Listener {
             }
 
             plugin.setSetting(event.getBlock().getLocation(), "OK-Location",
-                new Location(event.getBlock().getWorld(), x, y, z));
+            new Location(event.getBlock().getWorld(), x, y, z));
         } else {
             plugin.setSetting(event.getBlock().getLocation(), "OK-Location",
                 getBlockBehind((Sign) event.getBlock().getState()).getLocation());
@@ -532,8 +551,12 @@ public class SignCreate implements Listener {
         String[] linesplit = line.split(";");
 
         if (linesplit[0] != "" && linesplit[0].length()>0) {
-            plugin.setSetting(event.getBlock().getLocation(), "Error-Delay",
-                linesplit[0]);
+        	if(isNumber(linesplit[0])){
+        		plugin.setSetting(event.getBlock().getLocation(), "Error-Delay", linesplit[0]);
+        	} else {
+                event.getPlayer().sendMessage("Error in Line 4. (First parameter is not a number)");
+                return false;
+        	}
         } else {
             plugin.setSetting(event.getBlock().getLocation(), "Error-Delay", 3);
         }
@@ -542,9 +565,7 @@ public class SignCreate implements Listener {
             String[] loc = linesplit[1].split(",");
 
             if (loc.length < 3) {
-                event.getPlayer()
-                     .sendMessage("Error in Line 4. (Destination Format) ("+loc.length+")");
-
+                event.getPlayer().sendMessage("Error in Line 4. (Destination Format) ("+loc.length+")");
                 return false;
             }
 
@@ -555,8 +576,7 @@ public class SignCreate implements Listener {
                 return false;
             }
 
-            Location blockloc = getBlockBehind((Sign) event.getBlock().getState())
-                                    .getLocation();
+            Location blockloc = getBlockBehind((Sign) event.getBlock().getState()).getLocation();
             double x = blockloc.getX();
             double y = blockloc.getY() + Integer.parseInt(loc[1]);
             double z = blockloc.getZ();
