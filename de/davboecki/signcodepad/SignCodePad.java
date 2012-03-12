@@ -206,8 +206,7 @@ public class SignCodePad extends JavaPlugin {
 
             SettingsSave = (SettingsSave) yaml.load(new UnicodeReader(pFile));
         } catch (FileNotFoundException e) {
-            log.severe(
-                "[SignCodePad] Could not Load Sign Config. File Not Found.");
+            log.warning("[SignCodePad] Could not Load Sign Config. File Not Found. (This is normal on first run.)");
         } catch (Exception ex) {
             ex.printStackTrace();
             log.severe("[SignCodePad] Could not Load Sign Config.");
@@ -249,8 +248,7 @@ public class SignCodePad extends JavaPlugin {
             CalibrationSettings = (CalibrationSettings) yaml_b.load(new UnicodeReader(
                         pFile));
         } catch (FileNotFoundException e) {
-            log.severe(
-                "[SignCodePad] Could not Load Sign Calibration. File Not Found.");
+            log.warning("[SignCodePad] Could not Load Sign Calibration. File Not Found. (This is normal on first run.)");
         } catch (Exception ex) {
             ex.printStackTrace();
             log.severe("[SignCodePad] Could not Load Sign Calibration.");
