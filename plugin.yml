@@ -20,3 +20,5 @@ permissions:
     default: false
   signcodepad.create:
     default: false
+  signcodepad.disablejoinmessage:
+    default: false

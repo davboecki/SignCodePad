@@ -44,8 +44,7 @@ public class CodePadPlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
-        if (!plugin.CalibrationSettings.CalibrationList.containsKey(
-                    player.getName()) && plugin.hasPermission(event.getPlayer(), "signcodepad.use")) {
+        if (!plugin.CalibrationSettings.CalibrationList.containsKey(player.getName()) && plugin.hasPermission(event.getPlayer(), "signcodepad.use") && !plugin.hasPermission(event.getPlayer(), "signcodepad.disablejoinmessage")) {
             new CalNoteThread(player).start();
         }
     }
