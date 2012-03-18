@@ -51,7 +51,7 @@ public class SignCreate implements Listener {
             	}
             }
         } else //if (plugin.hasSetting(event.getBlock().getLocation())) {
-            if(isSignOnBlock(event.getBlock())/* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")*/){
+            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")*/){
               	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
                	event.setCancelled(true);
             //}
@@ -67,9 +67,12 @@ public class SignCreate implements Listener {
     
     @EventHandler()
     public void onPhysics(BlockPhysicsEvent event) {
-    	if(isAccessDenied(event.getBlock())){
-			event.setCancelled(true);
-		}
+    	try {
+	    	if(event.getBlock() == null) return;
+	    	if(isAccessDenied(event.getBlock())){
+				event.setCancelled(true);
+			}
+    	} catch(Exception e){}
     }
     
     @EventHandler()
@@ -84,6 +87,8 @@ public class SignCreate implements Listener {
     
     @EventHandler()
     public void onPistonRetract(BlockPistonRetractEvent event){
+    	if(event.getRetractLocation() == null) return;
+    	if(event.getRetractLocation().getBlock() == null) return;
     	if(isAccessDenied(event.getRetractLocation().getBlock())){
 			event.setCancelled(true);
 		}
@@ -92,7 +97,7 @@ public class SignCreate implements Listener {
     private boolean isAccessDenied(Block block) {
     	if(plugin.hasSetting(block.getLocation())){
     		return true;
-    	} else if(isSignOnBlock(block)) {
+    	} else if(getSignOnBlock(block) != null && plugin.hasSetting(getSignOnBlock(block).getLocation())) {
     		return true;
     	} else if(plugin.isLockedBlock(block)){
     		return true;
@@ -102,22 +107,22 @@ public class SignCreate implements Listener {
     	return false;
     }
     
-    private boolean isSignOnBlock(Block block){
+    private Block getSignOnBlock(Block block){
     	Location loc = block.getLocation();
     	Block b;
         if((b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
         	if(((Sign)b.getState()).getRawData() == 5)
-        		return true; 
+        		return b; 
         if((b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
             if(((Sign)b.getState()).getRawData() == 4)
-            	return true;
+            	return b;
         if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
             if(((Sign)b.getState()).getRawData() == 3)
-            	return true;
+            	return b;
         if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
             if(((Sign)b.getState()).getRawData() == 2)
-            	return true;
-    	return false;
+            	return b;
+    	return null;
     }
     
     private Block getBlockBehind(Sign sign) {
