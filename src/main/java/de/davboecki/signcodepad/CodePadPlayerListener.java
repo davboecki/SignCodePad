@@ -3,32 +3,20 @@ package de.davboecki.signcodepad;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import de.davboecki.signcodepad.event.CalSaver;
-
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet100OpenWindow;
-import net.minecraft.server.TileEntity;
-import net.minecraft.server.TileEntitySign;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.block.CraftChest;
-import org.bukkit.craftbukkit.block.CraftSign;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.Listener;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
+
+import de.davboecki.signcodepad.event.CalSaver;
 
 
 public class CodePadPlayerListener implements Listener {
@@ -78,7 +66,7 @@ public class CodePadPlayerListener implements Listener {
 
             break;
 
-        //Süden
+        //Sï¿½den
         case 4:
             x = signloc.getX() - playerloc.getX() + 1;
             z = playerloc.getZ() - signloc.getZ();
@@ -112,7 +100,7 @@ public class CodePadPlayerListener implements Listener {
 
             break;
 
-        //Süden
+        //Sï¿½den
         case 4:
             Yaw -= 270;
 
@@ -155,7 +143,7 @@ public class CodePadPlayerListener implements Listener {
 
             break;
 
-        //Süden
+        //Sï¿½den
         case 4:
             x = signloc.getX() - playerloc.getX() + 1;
             y = playerloc.getY() - signloc.getY();
@@ -208,7 +196,7 @@ public class CodePadPlayerListener implements Listener {
     }
 
     private void setError(Sign sign, Player player, String Type) {
-        sign.setLine(0, "1 2 3 |  §cErr ");
+        sign.setLine(0, "1 2 3 |  ï¿½cErr ");
         sign.update();
         new ErrorReset(sign, player).start();
 
@@ -614,7 +602,7 @@ public class CodePadPlayerListener implements Listener {
         }
 
     	Sign sign = (Sign) event.getClickedBlock().getState();
-        sign.setLine(0, "1 2 3 |  §aOK  ");
+        sign.setLine(0, "1 2 3 |  ï¿½aOK  ");
         sign.update();
         
     	try {
@@ -641,7 +629,8 @@ public class CodePadPlayerListener implements Listener {
         try {
         	plugin.getServer().getPluginManager().callEvent(interactevent);
         	if(!interactevent.isCancelled()) {
-        		net.minecraft.server.Block.byId[block.getTypeId()].interact(((CraftWorld)block.getWorld()).getHandle(), block.getX(), block.getY(), block.getZ(), ((CraftPlayer)event.getPlayer()).getHandle());
+        		SignCodePad.getInstance().bridge.interactOnBlock(block.getX(), block.getY(), block.getZ(), block.getWorld(), event.getPlayer(), block.getTypeId());
+        		//net.minecraft.server.Block.byId[block.getTypeId()].interact(((CraftWorld)block.getWorld()).getHandle(), block.getX(), block.getY(), block.getZ(), ((CraftPlayer)event.getPlayer()).getHandle());
         	}
         } catch(Exception e) {
         	event.getPlayer().sendMessage(ChatColor.RED+"Couldn't automaticly interact locked block. Please report this problem.");
@@ -652,7 +641,7 @@ public class CodePadPlayerListener implements Listener {
         //event.getClickedBlock().setData(data);
 
     	//sign = (Sign) event.getClickedBlock().getState();
-        sign.setLine(0, "1 2 3 |  §aOK  ");
+        sign.setLine(0, "1 2 3 |  ï¿½aOK  ");
         sign.setLine(1, "4 5 6 | ----");
         sign.setLine(2, "7 8 9 |  <<- ");
         sign.setLine(3, "* 0 # |  OK  ");

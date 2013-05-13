@@ -5,14 +5,11 @@ import java.util.concurrent.Callable;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftWorld;
 
-public class BlockChangerTask implements Callable{
+public class BlockChangerTask implements Callable {
 	
 	public static ArrayList <Block> Blocks = new ArrayList<Block>();
-	
-	@Override
-	public Object call() {
+	public Object call() throws Exception {
 		if(Blocks.size()>0){
 			for(Block block:Blocks.toArray(new Block[Blocks.size()])){
 				try{

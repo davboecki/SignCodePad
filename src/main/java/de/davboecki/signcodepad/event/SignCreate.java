@@ -2,23 +2,10 @@ package de.davboecki.signcodepad.event;
 
 import java.util.ArrayList;
 
-import de.davboecki.signcodepad.CalTypes;
-import de.davboecki.signcodepad.MD5;
-import de.davboecki.signcodepad.SignCodePad;
-import de.davboecki.signcodepad.SignLoc;
-
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet100OpenWindow;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.block.CraftChest;
-import org.bukkit.craftbukkit.block.CraftSign;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -27,6 +14,11 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
+
+import de.davboecki.signcodepad.CalTypes;
+import de.davboecki.signcodepad.MD5;
+import de.davboecki.signcodepad.SignCodePad;
+import de.davboecki.signcodepad.SignLoc;
 
 
 public class SignCreate implements Listener {
@@ -146,7 +138,7 @@ public class SignCreate implements Listener {
 
             break;
 
-        //Süden
+        //Sï¿½den
         case 4:
             x = signloc.getX() + 2;
             z = signloc.getZ();
@@ -343,7 +335,7 @@ public class SignCreate implements Listener {
                     plugin.setSetting(sign.getLocation(), "Owner",event.getPlayer().getName());
                     plugin.setSetting(sign.getLocation(), "Block",chest.getLocation());
                 	
-                	CraftSign cSign = (CraftSign) sign.getState();
+                	Sign cSign = (Sign) sign.getState();
                 	
                 	cSign.setLine(0, "1 2 3 |       ");
                 	cSign.setLine(1, "4 5 6 | ----");
@@ -527,7 +519,7 @@ public class SignCreate implements Listener {
 
                 break;
 
-            //Süden
+            //Sï¿½den
             case 4:
                 x += Integer.parseInt(loc[0]);
                 z += Integer.parseInt(loc[2]);
@@ -601,7 +593,7 @@ public class SignCreate implements Listener {
 
                 break;
 
-            //Süden
+            //Sï¿½den
             case 4:
                 x += Integer.parseInt(loc[0]);
                 z += Integer.parseInt(loc[2]);

@@ -10,13 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
-
-import de.davboecki.signcodepad.event.CalSaver;
-import de.davboecki.signcodepad.event.SignCreate;
-import de.davboecki.signcodepad.event.WorldLoadListener;
-import de.davboecki.signcodepad.yaml.MyYamlConstructor;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,12 +18,16 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
+
+import de.davboecki.signcodepad.event.CalSaver;
+import de.davboecki.signcodepad.event.SignCreate;
+import de.davboecki.signcodepad.event.WorldLoadListener;
+import de.davboecki.signcodepad.yaml.MyYamlConstructor;
 
 
 public class SignCodePad extends JavaPlugin {
@@ -51,6 +49,7 @@ public class SignCodePad extends JavaPlugin {
     Logger log = Logger.getLogger("Minecraft");
     Yaml yaml;
     Yaml yaml_b;
+    public MinecraftBridgeCalls bridge;
 
     public Location getLocation(SignLoc loc,boolean flag) {
     	if(getWorld(loc.world) == null){
@@ -265,6 +264,13 @@ public class SignCodePad extends JavaPlugin {
         save();
         
         //this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BlockChangerTask(), 1, 1);
+        
+        try {
+			bridge = new MinecraftBridgeCalls();
+		} catch (PluginOutOfDateException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
         
         log.info("[SignCodePad] v"+this.getDescription().getVersion()+" enabled.");
     }
