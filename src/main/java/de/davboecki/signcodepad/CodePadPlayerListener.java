@@ -66,7 +66,7 @@ public class CodePadPlayerListener implements Listener {
 
             break;
 
-        //S�den
+        //Süden
         case 4:
             x = signloc.getX() - playerloc.getX() + 1;
             z = playerloc.getZ() - signloc.getZ();
@@ -100,7 +100,7 @@ public class CodePadPlayerListener implements Listener {
 
             break;
 
-        //S�den
+        //Süden
         case 4:
             Yaw -= 270;
 
@@ -196,7 +196,7 @@ public class CodePadPlayerListener implements Listener {
     }
 
     private void setError(Sign sign, Player player, String Type) {
-        sign.setLine(0, "1 2 3 |  �cErr ");
+        sign.setLine(0, "1 2 3 |  §cErr ");
         sign.update();
         new ErrorReset(sign, player).start();
 
@@ -602,7 +602,7 @@ public class CodePadPlayerListener implements Listener {
         }
 
     	Sign sign = (Sign) event.getClickedBlock().getState();
-        sign.setLine(0, "1 2 3 |  �aOK  ");
+        sign.setLine(0, "1 2 3 |  §aOK  ");
         sign.update();
         
     	try {
@@ -620,10 +620,6 @@ public class CodePadPlayerListener implements Listener {
     	Sign sign = (Sign) event.getClickedBlock().getState();
         Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"Block"));
         
-        byte data = event.getClickedBlock().getData();
-        
-        //event.getClickedBlock().setTypeId(0);
-        
         isLocalInteract = true;
         PlayerInteractEvent interactevent = new PlayerInteractEvent(event.getPlayer(), Action.RIGHT_CLICK_BLOCK, event.getItem(), block, event.getBlockFace());
         try {
@@ -633,15 +629,12 @@ public class CodePadPlayerListener implements Listener {
         		//net.minecraft.server.Block.byId[block.getTypeId()].interact(((CraftWorld)block.getWorld()).getHandle(), block.getX(), block.getY(), block.getZ(), ((CraftPlayer)event.getPlayer()).getHandle());
         	}
         } catch(Exception e) {
+        	e.printStackTrace();
         	event.getPlayer().sendMessage(ChatColor.RED+"Couldn't automaticly interact locked block. Please report this problem.");
         }
         isLocalInteract = false;
         
-        //event.getClickedBlock().setType(Material.WALL_SIGN);
-        //event.getClickedBlock().setData(data);
-
-    	//sign = (Sign) event.getClickedBlock().getState();
-        sign.setLine(0, "1 2 3 |  �aOK  ");
+        sign.setLine(0, "1 2 3 |  §aOK  ");
         sign.setLine(1, "4 5 6 | ----");
         sign.setLine(2, "7 8 9 |  <<- ");
         sign.setLine(3, "* 0 # |  OK  ");

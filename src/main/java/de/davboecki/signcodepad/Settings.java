@@ -6,7 +6,7 @@ import java.util.Set;
 import org.bukkit.Location;
 
 public class Settings {
-	public Settings(){}
+	
     public static HashMap<Location, HashMap<String, Object>> Settings = new HashMap<Location, HashMap<String, Object>>();
     
     public boolean containsKey(Object key){

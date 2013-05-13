@@ -128,60 +128,6 @@ public class SignCodePad extends JavaPlugin {
     	return player.hasPermission(node) || player.isOp();
     }
     
-    private void Correct_Path(String file){
-        String s;
-        String Filecontent = "";
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                        new FileInputStream(getDataFolder().getPath() + file)));
-
-            try {
-                while (null != (s = in.readLine())) {
-                	Filecontent += s+"\n";
-                }
-            } catch (Exception ex) {
-                System.out.println(ex);
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (FileNotFoundException ex) {}
-        String[] FileSplit = Filecontent.split("me.boecki.SignCodePad");
-        Filecontent = "";
-        for(String Part: FileSplit){
-        	if(Filecontent != "")
-        		Filecontent += "de.davboecki.signcodepad";
-        	Filecontent += Part;
-        }
-        BufferedWriter out;
-        try {
-            out = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(getDataFolder().getPath() + file)));
-
-            try {
-            	for(String Part: Filecontent.split("\n")){
-            		out.write(Part, 0, Part.length());
-            		out.newLine();
-            	}
-            } catch (IOException ex) {
-                System.out.println(ex);
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {}
-    }
-    
     public void onEnable() {
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(CodePadPlayerListener, this);
@@ -196,13 +142,10 @@ public class SignCodePad extends JavaPlugin {
 
         FileInputStream pFile;
 
-        SettingsSave SettingsSave = new SettingsSave(null);
-        SettingsSave.Settings = new HashMap<SignLoc, HashMap<String, Object>>();
-        Correct_Path("/Signs.yml");
+        SettingsSave SettingsSave = new SettingsSave();
+        SettingsSave.Settings = new HashMap<Object, HashMap<String, Object>>();
         try {
-            pFile = new FileInputStream(new File(getDataFolder().getPath() +
-                        "/Signs.yml"));
-
+            pFile = new FileInputStream(new File(getDataFolder().getPath() + "/Signs.yml"));
             SettingsSave = (SettingsSave) yaml.load(new UnicodeReader(pFile));
         } catch (FileNotFoundException e) {
             log.warning("[SignCodePad] Could not Load Sign Config. File Not Found. (This is normal on first run.)");
@@ -236,10 +179,6 @@ public class SignCodePad extends JavaPlugin {
         pDesc.putListPropertyType("CalibrationList", Calibration.class);
         cstr.addTypeDescription(pDesc_b);
         this.yaml_b = new Yaml(cstr_b);
-
-        FileInputStream pFile_b;
-
-        Correct_Path("/Calibration.yml");
         try {
             pFile = new FileInputStream(new File(getDataFolder().getPath() +
                         "/Calibration.yml"));
@@ -276,8 +215,8 @@ public class SignCodePad extends JavaPlugin {
     }
 
     public void save() {
-        SettingsSave SettingsSave = new SettingsSave(null);
-        SettingsSave.Settings = new HashMap<SignLoc, HashMap<String, Object>>();
+        SettingsSave SettingsSave = new SettingsSave();
+        SettingsSave.Settings = new HashMap<Object, HashMap<String, Object>>();
 
         for (Location loc : Settings.keySet()) {
             for (String key : Settings.Settings.get(loc).keySet()) {

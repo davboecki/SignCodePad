@@ -200,17 +200,14 @@ public class SignCreate implements Listener {
             	Location loc = event.getBlock().getLocation();
             	loc.setY(event.getBlock().getLocation().getY() - 1);
             	ArrayList<Integer> Lockable = new ArrayList<Integer>();
-            	ArrayList<Integer> DataValueCahnge = new ArrayList<Integer>();
             	Lockable.add(Material.CHEST.getId());
             	Lockable.add(Material.FURNACE.getId());
             	Lockable.add(Material.BURNING_FURNACE.getId());
             	Lockable.add(Material.WORKBENCH.getId());
             	Lockable.add(Material.LEVER.getId());
-            	//Lockable.add(Material.STONE_BUTTON.getId());
             	Lockable.add(Material.DISPENSER.getId());
-            	DataValueCahnge.add(Material.CHEST.getId());
-            	DataValueCahnge.add(Material.FURNACE.getId());
-            	DataValueCahnge.add(Material.BURNING_FURNACE.getId());
+            	Lockable.add(Material.ANVIL.getId());
+            	Lockable.add(Material.DROPPER.getId());
             	
             	
             	if(!Lockable.contains(loc.getBlock().getTypeId())) {
