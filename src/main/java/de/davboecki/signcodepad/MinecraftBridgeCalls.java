@@ -17,7 +17,7 @@ public class MinecraftBridgeCalls extends MinecraftBridge {
 	
 	public void interactOnBlock(int x, int y, int z, World world, Player player, Material material) throws PluginOutOfDateException {
 		Object[] byId = (Object[]) MinecraftBridge.getField(cbMapping.get("Block"), "byId", null);
-		Object block = byId[material];
+		Object block = byId[material.getId()];
 		//Method interact = block.getClass().getDeclaredMethod("interact", new Class[]{MinecraftBridge.loadClass(cbMapping.get("World")),int.class,int.class,int.class, MinecraftBridge.loadClass(cbMapping.get("Player"))});
 		Object NMSWorld = MinecraftBridge.invokeMethod(cbMapping.get("CraftWorld"), "getHandle", world, new Class[]{});
 		Object NMSPlayer = MinecraftBridge.invokeMethod(cbMapping.get("CraftPlayer"), "getHandle", player, new Class[]{});
