@@ -14,7 +14,7 @@ public class RedstoneTorchReset extends SignReseter{
 
 	public void reset(){
 		super.reset();
-		if(block.getTypeId() == Material.REDSTONE_TORCH_ON.getId()){
+		if(block.getType() == Material.LEGACY_REDSTONE_TORCH_ON){
 			BlockChangerTask.Blocks.add(block);
 			SignCodePad.getInstance().getServer().getScheduler().callSyncMethod(SignCodePad.getInstance(), new BlockChangerTask());
 		} else {
