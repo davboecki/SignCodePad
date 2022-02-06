@@ -165,7 +165,7 @@ public class SignCodePad extends JavaPlugin {
                     }
                 }
                 Location LocationLoc = getLocation(loc);
-                if(LocationLoc != null && Valid && (LocationLoc.getBlock().getTypeId() == Material.WALL_SIGN.getId())){
+                if(LocationLoc != null && Valid && (LocationLoc.getBlock().getType() == Material.OAK_WALL_SIGN)){
                 	Settings.put(LocationLoc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
                 } else {
                 	RemovedSigns.put(loc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));

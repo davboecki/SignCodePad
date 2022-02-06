@@ -224,8 +224,8 @@ public class CodePadPlayerListener implements Listener {
 
                 if (Count > ErrorCount) {
                     Block block = sign.getWorld().getBlockAt((Location) plugin.getSetting(sign.getBlock().getLocation(), "Error-Location"));
-            		if(block.getTypeId() == Material.TORCH.getId()){
-            			block.setTypeId(Material.REDSTONE_TORCH_ON.getId());
+            		if(block.getType() == Material.WALL_TORCH){
+            			block.setType(Material.REDSTONE_WALL_TORCH);
             		} else {
             			player.sendMessage("No torch to change.");
             		}
@@ -241,7 +241,7 @@ public class CodePadPlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
     	if(event.getClickedBlock() == null) return;
     	if(isLocalInteract) return;
-        if (event.getClickedBlock().getTypeId() == Material.WALL_SIGN.getId()) {
+        if (event.getClickedBlock().getType() == Material.OAK_WALL_SIGN) {
             if (plugin.CalLoc.containsKey(event.getPlayer().getName())) {
             	if(plugin.CalType.containsKey(event.getPlayer().getName())){
             		if(plugin.CalType.get(event.getPlayer().getName()) == CalTypes.Normal){
@@ -405,7 +405,7 @@ public class CodePadPlayerListener implements Listener {
             		plugin.save();
             	}
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.SIGN, 1));
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.OAK_SIGN, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
@@ -485,7 +485,7 @@ public class CodePadPlayerListener implements Listener {
             }
             if (Calsave.CalNumber >= 4) {
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.SIGN, 1));
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.OAK_SIGN, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
@@ -594,8 +594,8 @@ public class CodePadPlayerListener implements Listener {
     private void HandleTorchPad(PlayerInteractEvent event) {
         Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Location"));
         
-        if(block.getTypeId() == Material.TORCH.getId()){
-        	block.setTypeId(Material.REDSTONE_TORCH_ON.getId());
+        if(block.getType() == Material.WALL_TORCH){
+        	block.setType(Material.REDSTONE_WALL_TORCH);
 
         } else {
         	event.getPlayer().sendMessage("No torch to change.");
@@ -625,7 +625,7 @@ public class CodePadPlayerListener implements Listener {
         try {
         	plugin.getServer().getPluginManager().callEvent(interactevent);
         	if(!interactevent.isCancelled()) {
-        		SignCodePad.getInstance().bridge.interactOnBlock(block.getX(), block.getY(), block.getZ(), block.getWorld(), event.getPlayer(), block.getTypeId());
+        		SignCodePad.getInstance().bridge.interactOnBlock(block.getX(), block.getY(), block.getZ(), block.getWorld(), event.getPlayer(), block.getType());
         		//net.minecraft.server.Block.byId[block.getTypeId()].interact(((CraftWorld)block.getWorld()).getHandle(), block.getX(), block.getY(), block.getZ(), ((CraftPlayer)event.getPlayer()).getHandle());
         	}
         } catch(Exception e) {

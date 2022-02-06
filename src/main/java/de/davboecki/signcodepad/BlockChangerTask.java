@@ -13,7 +13,7 @@ public class BlockChangerTask implements Callable {
 		if(Blocks.size()>0){
 			for(Block block:Blocks.toArray(new Block[Blocks.size()])){
 				try{
-					block.setTypeId(Material.TORCH.getId());
+					block.setType(Material.TORCH);
 				} catch(Exception e){}
 			}
 			Blocks.clear();

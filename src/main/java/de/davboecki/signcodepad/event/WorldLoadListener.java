@@ -34,7 +34,7 @@ public class WorldLoadListener implements Listener {
                 }
             }
             Location LocationLoc = plugin.getLocation(loc);
-            if(LocationLoc != null && Valid && LocationLoc.getBlock().getTypeId() == Material.WALL_SIGN.getId()){
+            if(LocationLoc != null && Valid && LocationLoc.getBlock().getType() == Material.OAK_WALL_SIGN){
             	plugin.Settings.put(LocationLoc, (HashMap<String, Object>)plugin.RemovedSigns.get(loc));
             	plugin.RemovedSigns.remove(loc);
             }

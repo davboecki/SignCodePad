@@ -30,7 +30,7 @@ public class SignCreate implements Listener {
 
     @EventHandler()
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getTypeId() == Material.WALL_SIGN.getId()) {
+        if (event.getBlock().getType() == Material.OAK_WALL_SIGN) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
             	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
                 plugin.removeSetting(event.getBlock().getLocation());
@@ -102,16 +102,16 @@ public class SignCreate implements Listener {
     private Block getSignOnBlock(Block block){
     	Location loc = block.getLocation();
     	Block b;
-        if((b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+        if((b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getType() == Material.OAK_WALL_SIGN)
         	if(((Sign)b.getState()).getRawData() == 5)
         		return b; 
-        if((b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+        if((b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getType() == Material.OAK_WALL_SIGN)
             if(((Sign)b.getState()).getRawData() == 4)
             	return b;
-        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getType() == Material.OAK_WALL_SIGN)
             if(((Sign)b.getState()).getRawData() == 3)
             	return b;
-        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
+        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getType() == Material.OAK_WALL_SIGN)
             if(((Sign)b.getState()).getRawData() == 2)
             	return b;
     	return null;
@@ -159,7 +159,7 @@ public class SignCreate implements Listener {
 
     @EventHandler()
     public void onSignChange(SignChangeEvent event) {
-    	if (event.getBlock().getTypeId() == Material.SIGN_POST.getId()){
+    	if (event.getBlock().getType() == Material.LEGACY_SIGN_POST){
     		if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
     			event.setLine(0, "Please");
                 event.setLine(1, "create");
@@ -167,14 +167,14 @@ public class SignCreate implements Listener {
                 event.setLine(3, "wallsign");
     		}
     	}
-    	if (event.getBlock().getTypeId() != Material.WALL_SIGN.getId()) return;
+    	if (event.getBlock().getType() != Material.OAK_WALL_SIGN) return;
     	 if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
         	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
         		event.getBlock().setType(Material.AIR);
                 event.getBlock().getLocation().getWorld()
                     .dropItem(event.getBlock().getLocation(),
-                    new ItemStack(Material.SIGN, 1));
+                    new ItemStack(Material.OAK_SIGN, 1));
         		return;
         	}
         	if (event.getLine(1).equalsIgnoreCase("Cal") && event.getLine(2).equalsIgnoreCase("")) {
@@ -202,15 +202,15 @@ public class SignCreate implements Listener {
             	ArrayList<Integer> Lockable = new ArrayList<Integer>();
             	Lockable.add(Material.CHEST.getId());
             	Lockable.add(Material.FURNACE.getId());
-            	Lockable.add(Material.BURNING_FURNACE.getId());
-            	Lockable.add(Material.WORKBENCH.getId());
+            	Lockable.add(Material.LEGACY_BURNING_FURNACE.getId());
+            	Lockable.add(Material.LEGACY_WORKBENCH.getId());
             	Lockable.add(Material.LEVER.getId());
             	Lockable.add(Material.DISPENSER.getId());
             	Lockable.add(Material.ANVIL.getId());
             	Lockable.add(Material.DROPPER.getId());
             	
             	
-            	if(!Lockable.contains(loc.getBlock().getTypeId())) {
+            	if(!Lockable.contains(loc.getBlock().getType())) {
             		event.getPlayer().sendMessage("No lockable block under sign.");
             		return;
             	}
@@ -312,21 +312,21 @@ public class SignCreate implements Listener {
 	                	}
                 	}
                 	Block sign = signpos.getBlock();
-                	if(sign.getTypeId() != 0) {
+                	if(sign.getType() != Material.AIR) {
                 		event.getPlayer().sendMessage("[SignCodePad] The block in front of the lockable block is not air.");
                 		return;
                 	} else {
                 		event.setCancelled(true);
                 	}
-                	sign.setTypeId(Material.WALL_SIGN.getId());
+                	sign.setType(Material.OAK_WALL_SIGN);
                 	
                 	if(ChangeDataValue) {
-                		sign.setData(chest.getData());
+                		sign.setBlockData(chest.getBlockData());
                 	} else {
-                		sign.setData(event.getBlock().getData());
+                		sign.setBlockData(event.getBlock().getBlockData());
                 	}
 
-                    event.getBlock().setTypeId(0);
+                    event.getBlock().setType(Material.AIR);
                 	
                     plugin.setSetting(sign.getLocation(),"MD5", md5b.getValue());
                     plugin.setSetting(sign.getLocation(), "Owner",event.getPlayer().getName());
@@ -351,7 +351,7 @@ public class SignCreate implements Listener {
                     event.getBlock().setType(Material.AIR);
                     event.getBlock().getLocation().getWorld()
                         .dropItem(event.getBlock().getLocation(),
-                        new ItemStack(Material.SIGN, 1));
+                        new ItemStack(Material.OAK_SIGN, 1));
             		return;
             	}
                 boolean Worked = true;
@@ -429,7 +429,7 @@ public class SignCreate implements Listener {
                         	}
                         	return;
                         }
-                        block.setTypeId(Material.TORCH.getId());
+                        block.setType(Material.WALL_TORCH); // Torch created behind sign onplace
                         if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
                         	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
                         	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
@@ -440,7 +440,7 @@ public class SignCreate implements Listener {
                         		 }
                         		 return;
                         	 }
-                        	 blockb.setTypeId(Material.TORCH.getId());
+                        	 blockb.setType(Material.WALL_TORCH); // Torch created behind sign onplace
                         }
                         plugin.save();
                         event.getPlayer().sendMessage("CodePad Created.");
