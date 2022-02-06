@@ -30,7 +30,8 @@ public class SignCreate implements Listener {
 
     @EventHandler()
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() == Material.OAK_WALL_SIGN) {
+        Material t = event.getBlock().getType();
+        if (t == Material.OAK_WALL_SIGN || t == Material.SPRUCE_WALL_SIGN || t == Material.BIRCH_WALL_SIGN || t == Material.ACACIA_WALL_SIGN || t == Material.JUNGLE_WALL_SIGN || t == Material.DARK_OAK_WALL_SIGN || t == Material.CRIMSON_WALL_SIGN || t == Material.WARPED_WALL_SIGN) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
             	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
                 plugin.removeSetting(event.getBlock().getLocation());
@@ -102,16 +103,20 @@ public class SignCreate implements Listener {
     private Block getSignOnBlock(Block block){
     	Location loc = block.getLocation();
     	Block b;
-        if((b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getType() == Material.OAK_WALL_SIGN)
+        Material ifOne = (b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getType();
+        Material ifTwo = (b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getType();
+        Material ifThree = (b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getType();
+        Material ifFour = (b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getType();
+        if(ifOne == Material.OAK_WALL_SIGN || ifOne == Material.SPRUCE_WALL_SIGN || ifOne == Material.BIRCH_WALL_SIGN || ifOne == Material.ACACIA_WALL_SIGN || ifOne == Material.JUNGLE_WALL_SIGN || ifOne == Material.DARK_OAK_WALL_SIGN || ifOne == Material.CRIMSON_WALL_SIGN || ifOne == Material.WARPED_WALL_SIGN)
         	if(((Sign)b.getState()).getRawData() == 5)
         		return b; 
-        if((b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getType() == Material.OAK_WALL_SIGN)
+        if(ifTwo == Material.OAK_WALL_SIGN || ifTwo == Material.SPRUCE_WALL_SIGN || ifTwo == Material.BIRCH_WALL_SIGN || ifTwo == Material.ACACIA_WALL_SIGN || ifTwo == Material.JUNGLE_WALL_SIGN || ifTwo == Material.DARK_OAK_WALL_SIGN || ifTwo == Material.CRIMSON_WALL_SIGN || ifTwo == Material.WARPED_WALL_SIGN)
             if(((Sign)b.getState()).getRawData() == 4)
             	return b;
-        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getType() == Material.OAK_WALL_SIGN)
+        if(ifThree == Material.OAK_WALL_SIGN || ifThree == Material.SPRUCE_WALL_SIGN || ifThree == Material.BIRCH_WALL_SIGN || ifThree == Material.ACACIA_WALL_SIGN || ifThree == Material.JUNGLE_WALL_SIGN || ifThree == Material.DARK_OAK_WALL_SIGN || ifThree == Material.CRIMSON_WALL_SIGN || ifThree == Material.WARPED_WALL_SIGN)
             if(((Sign)b.getState()).getRawData() == 3)
             	return b;
-        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getType() == Material.OAK_WALL_SIGN)
+        if(ifFour == Material.OAK_WALL_SIGN || ifFour == Material.SPRUCE_WALL_SIGN || ifFour == Material.BIRCH_WALL_SIGN || ifFour == Material.ACACIA_WALL_SIGN || ifFour == Material.JUNGLE_WALL_SIGN || ifFour == Material.DARK_OAK_WALL_SIGN || ifFour == Material.CRIMSON_WALL_SIGN || ifFour == Material.WARPED_WALL_SIGN)
             if(((Sign)b.getState()).getRawData() == 2)
             	return b;
     	return null;
@@ -159,7 +164,8 @@ public class SignCreate implements Listener {
 
     @EventHandler()
     public void onSignChange(SignChangeEvent event) {
-    	if (event.getBlock().getType() == Material.LEGACY_SIGN_POST){
+        Material t = event.getBlock().getType();
+    	if (t == Material.OAK_SIGN || t == Material.SPRUCE_SIGN || t == Material.BIRCH_SIGN || t == Material.ACACIA_SIGN || t == Material.JUNGLE_SIGN || t == Material.DARK_OAK_SIGN || t == Material.CRIMSON_SIGN || t == Material.WARPED_SIGN){
     		if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
     			event.setLine(0, "Please");
                 event.setLine(1, "create");
@@ -167,14 +173,15 @@ public class SignCreate implements Listener {
                 event.setLine(3, "wallsign");
     		}
     	}
-    	if (event.getBlock().getType() != Material.OAK_WALL_SIGN) return;
-    	 if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
+        
+        if (t != Material.OAK_WALL_SIGN && t != Material.SPRUCE_WALL_SIGN && t != Material.BIRCH_WALL_SIGN && t != Material.ACACIA_WALL_SIGN && t != Material.JUNGLE_WALL_SIGN && t != Material.DARK_OAK_WALL_SIGN && t != Material.CRIMSON_WALL_SIGN && t != Material.WARPED_WALL_SIGN) return;
+         if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
         	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
         		event.getBlock().setType(Material.AIR);
                 event.getBlock().getLocation().getWorld()
                     .dropItem(event.getBlock().getLocation(),
-                    new ItemStack(Material.OAK_SIGN, 1));
+                    new ItemStack(event.getBlock().getType(), 1));
         		return;
         	}
         	if (event.getLine(1).equalsIgnoreCase("Cal") && event.getLine(2).equalsIgnoreCase("")) {
@@ -318,7 +325,7 @@ public class SignCreate implements Listener {
                 	} else {
                 		event.setCancelled(true);
                 	}
-                	sign.setType(Material.OAK_WALL_SIGN);
+                	sign.setType(event.getBlock().getType());
                 	
                 	if(ChangeDataValue) {
                 		sign.setBlockData(chest.getBlockData());
@@ -351,7 +358,7 @@ public class SignCreate implements Listener {
                     event.getBlock().setType(Material.AIR);
                     event.getBlock().getLocation().getWorld()
                         .dropItem(event.getBlock().getLocation(),
-                        new ItemStack(Material.OAK_SIGN, 1));
+                        new ItemStack(event.getBlock().getType(), 1));
             		return;
             	}
                 boolean Worked = true;
