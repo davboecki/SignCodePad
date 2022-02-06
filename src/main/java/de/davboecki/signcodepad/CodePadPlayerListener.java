@@ -241,7 +241,8 @@ public class CodePadPlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
     	if(event.getClickedBlock() == null) return;
     	if(isLocalInteract) return;
-        if (event.getClickedBlock().getType() == Material.OAK_WALL_SIGN) {
+        Material t = event.getClickedBlock().getType();
+        if (t == Material.OAK_WALL_SIGN || t == Material.SPRUCE_WALL_SIGN || t == Material.BIRCH_WALL_SIGN || t == Material.ACACIA_WALL_SIGN || t == Material.JUNGLE_WALL_SIGN || t == Material.DARK_OAK_WALL_SIGN || t == Material.CRIMSON_WALL_SIGN || t == Material.WARPED_WALL_SIGN) {
             if (plugin.CalLoc.containsKey(event.getPlayer().getName())) {
             	if(plugin.CalType.containsKey(event.getPlayer().getName())){
             		if(plugin.CalType.get(event.getPlayer().getName()) == CalTypes.Normal){
@@ -405,7 +406,7 @@ public class CodePadPlayerListener implements Listener {
             		plugin.save();
             	}
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.OAK_SIGN, 1));
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(sign.getType(), 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
@@ -485,7 +486,7 @@ public class CodePadPlayerListener implements Listener {
             }
             if (Calsave.CalNumber >= 4) {
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.OAK_SIGN, 1));
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(sign.getType(), 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
