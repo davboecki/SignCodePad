@@ -429,7 +429,7 @@ public class SignCreate implements Listener {
                         	}
                         	return;
                         }
-                        block.setType(Material.TORCH);
+                        block.setType(Material.WALL_TORCH); // Torch created behind sign onplace
                         if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
                         	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
                         	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
@@ -440,7 +440,7 @@ public class SignCreate implements Listener {
                         		 }
                         		 return;
                         	 }
-                        	 blockb.setType(Material.TORCH);
+                        	 blockb.setType(Material.WALL_TORCH); // Torch created behind sign onplace
                         }
                         plugin.save();
                         event.getPlayer().sendMessage("CodePad Created.");
