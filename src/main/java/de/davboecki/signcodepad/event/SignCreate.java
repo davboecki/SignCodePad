@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -107,59 +109,70 @@ public class SignCreate implements Listener {
         Material ifTwo = (b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getType();
         Material ifThree = (b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getType();
         Material ifFour = (b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getType();
+        
+        // Facing:
+        Directional meta = (Directional) (b.getState()).getBlockData();
+        BlockFace facing = meta.getFacing();
+
         if(ifOne == Material.OAK_WALL_SIGN || ifOne == Material.SPRUCE_WALL_SIGN || ifOne == Material.BIRCH_WALL_SIGN || ifOne == Material.ACACIA_WALL_SIGN || ifOne == Material.JUNGLE_WALL_SIGN || ifOne == Material.DARK_OAK_WALL_SIGN || ifOne == Material.CRIMSON_WALL_SIGN || ifOne == Material.WARPED_WALL_SIGN)
-        	if(((Sign)b.getState()).getRawData() == 5)
+            if(facing == BlockFace.EAST)
         		return b; 
         if(ifTwo == Material.OAK_WALL_SIGN || ifTwo == Material.SPRUCE_WALL_SIGN || ifTwo == Material.BIRCH_WALL_SIGN || ifTwo == Material.ACACIA_WALL_SIGN || ifTwo == Material.JUNGLE_WALL_SIGN || ifTwo == Material.DARK_OAK_WALL_SIGN || ifTwo == Material.CRIMSON_WALL_SIGN || ifTwo == Material.WARPED_WALL_SIGN)
-            if(((Sign)b.getState()).getRawData() == 4)
+            if(facing == BlockFace.WEST)
             	return b;
         if(ifThree == Material.OAK_WALL_SIGN || ifThree == Material.SPRUCE_WALL_SIGN || ifThree == Material.BIRCH_WALL_SIGN || ifThree == Material.ACACIA_WALL_SIGN || ifThree == Material.JUNGLE_WALL_SIGN || ifThree == Material.DARK_OAK_WALL_SIGN || ifThree == Material.CRIMSON_WALL_SIGN || ifThree == Material.WARPED_WALL_SIGN)
-            if(((Sign)b.getState()).getRawData() == 3)
+            if(facing == BlockFace.SOUTH)
             	return b;
         if(ifFour == Material.OAK_WALL_SIGN || ifFour == Material.SPRUCE_WALL_SIGN || ifFour == Material.BIRCH_WALL_SIGN || ifFour == Material.ACACIA_WALL_SIGN || ifFour == Material.JUNGLE_WALL_SIGN || ifFour == Material.DARK_OAK_WALL_SIGN || ifFour == Material.CRIMSON_WALL_SIGN || ifFour == Material.WARPED_WALL_SIGN)
-            if(((Sign)b.getState()).getRawData() == 2)
+            if(facing == BlockFace.NORTH)
             	return b;
     	return null;
     }
     
-    private Block getBlockBehind(Sign sign) {
+    private Block getBlockBehind(Sign sign) { // Cause of wrong torch location except for oak
         Location signloc = sign.getBlock().getLocation();
         double x = -1;
         double y = signloc.getY();
         double z = -1;
 
-        switch ((int) sign.getRawData()) {
+        // Facing:
+        Directional meta = (Directional) sign.getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        switch (facing) { // Don't ask why directions doesn't match with ENUM :/
         //Westen
-        case 2:
+        case NORTH:
             x = signloc.getX();
             z = signloc.getZ() + 2;
 
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             x = signloc.getX();
             z = signloc.getZ() - 2;
 
             break;
 
         //S�den
-        case 4:
+        case WEST:
             x = signloc.getX() + 2;
             z = signloc.getZ();
 
             break;
 
         //Norden
-        case 5:
+        case EAST:
             x = signloc.getX() - 2;
             z = signloc.getZ();
 
             break;
+
+        default:
+            break;
         }
 
-        return sign.getBlock().getWorld()
-                   .getBlockAt(new Location(sign.getBlock().getWorld(), x, y, z));
+        return sign.getBlock().getWorld().getBlockAt(new Location(sign.getBlock().getWorld(), x, y, z));
     }
 
     @EventHandler()
@@ -508,34 +521,41 @@ public class SignCreate implements Listener {
             double y = blockloc.getY() + Integer.parseInt(loc[1]);
             double z = blockloc.getZ();
 
-            switch ((int) ((Sign) event.getBlock().getState()).getRawData()) {
-            //Westen
-            case 2:
-                x += (Integer.parseInt(loc[2]) * -1);
-                z += Integer.parseInt(loc[0]);
+            // Facing:
+            Directional meta = (Directional) (event.getBlock().getState()).getBlockData();
+            BlockFace facing = meta.getFacing();
 
-                break;
+            switch (facing) { // Don't ask why directions doesn't match with ENUM :/
+                // Westen
+                case NORTH:
+                    x += (Integer.parseInt(loc[2]) * -1);
+                    z += Integer.parseInt(loc[0]);
 
-            //Osten
-            case 3:
-                x += Integer.parseInt(loc[2]);
-                z += (Integer.parseInt(loc[0]) * -1);
+                    break;
 
-                break;
+                // Osten
+                case SOUTH:
+                    x += Integer.parseInt(loc[2]);
+                    z += (Integer.parseInt(loc[0]) * -1);
 
-            //S�den
-            case 4:
-                x += Integer.parseInt(loc[0]);
-                z += Integer.parseInt(loc[2]);
+                    break;
 
-                break;
+                // S�den
+                case WEST:
+                    x += Integer.parseInt(loc[0]);
+                    z += Integer.parseInt(loc[2]);
 
-            //Norden
-            case 5:
-                x += (Integer.parseInt(loc[0]) * -1);
-                z += (Integer.parseInt(loc[2]) * -1);
+                    break;
 
-                break;
+                // Norden
+                case EAST:
+                    x += (Integer.parseInt(loc[0]) * -1);
+                    z += (Integer.parseInt(loc[2]) * -1);
+
+                    break;
+
+                default:
+                    break;
             }
 
             plugin.setSetting(event.getBlock().getLocation(), "OK-Location",
@@ -582,34 +602,41 @@ public class SignCreate implements Listener {
             double y = blockloc.getY() + Integer.parseInt(loc[1]);
             double z = blockloc.getZ();
 
-            switch ((int) ((Sign) event.getBlock().getState()).getRawData()) {
-            //Westen
-            case 2:
-                x += (Integer.parseInt(loc[2]) * -1);
-                z += Integer.parseInt(loc[0]);
+            // Facing:
+            Directional meta = (Directional) (event.getBlock().getState()).getBlockData();
+            BlockFace facing = meta.getFacing();
 
-                break;
+            switch (facing) { // Don't ask why directions doesn't match with ENUM :/
+                // Westen
+                case NORTH:
+                    x += (Integer.parseInt(loc[2]) * -1);
+                    z += Integer.parseInt(loc[0]);
 
-            //Osten
-            case 3:
-                x += Integer.parseInt(loc[2]);
-                z += (Integer.parseInt(loc[0]) * -1);
+                    break;
 
-                break;
+                // Osten
+                case SOUTH:
+                    x += Integer.parseInt(loc[2]);
+                    z += (Integer.parseInt(loc[0]) * -1);
 
-            //S�den
-            case 4:
-                x += Integer.parseInt(loc[0]);
-                z += Integer.parseInt(loc[2]);
+                    break;
 
-                break;
+                // S�den
+                case WEST:
+                    x += Integer.parseInt(loc[0]);
+                    z += Integer.parseInt(loc[2]);
 
-            //Norden
-            case 5:
-                x += (Integer.parseInt(loc[0]) * -1);
-                z += (Integer.parseInt(loc[2]) * -1);
+                    break;
 
-                break;
+                // Norden
+                case EAST:
+                    x += (Integer.parseInt(loc[0]) * -1);
+                    z += (Integer.parseInt(loc[2]) * -1);
+
+                    break;
+
+                default:
+                    break;
             }
 
             plugin.setSetting(event.getBlock().getLocation(), "Error-Location",
