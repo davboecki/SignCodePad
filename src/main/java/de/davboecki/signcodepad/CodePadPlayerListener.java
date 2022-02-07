@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -245,6 +246,41 @@ public class CodePadPlayerListener implements Listener {
                     Block block = sign.getWorld().getBlockAt((Location) plugin.getSetting(sign.getBlock().getLocation(), "Error-Location"));
             		if(block.getType() == Material.WALL_TORCH){
             			block.setType(Material.REDSTONE_WALL_TORCH);
+
+                        // Get sign facing direction
+                        BlockFace signFacingDirection = ((Directional) sign.getBlock().getBlockData()).getFacing();
+
+                        // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+                        BlockFace newTorchDir;
+                        switch (signFacingDirection) {
+                            case NORTH:
+                                newTorchDir = BlockFace.SOUTH;
+                                break;
+
+                            case SOUTH:
+                                newTorchDir = BlockFace.NORTH;
+                                break;
+
+                            case WEST:
+                                newTorchDir = BlockFace.EAST;
+                                break;
+
+                            case EAST:
+                                newTorchDir = BlockFace.WEST;
+                                break;
+
+                            default:
+                                newTorchDir = BlockFace.NORTH; // Default torch direction
+                                break;
+                        }
+
+                        // Update block facing (torch)
+                        BlockData bd = block.getBlockData();
+                        Directional blockdir = (Directional) bd;
+                        blockdir.setFacing(newTorchDir);
+                        bd = (BlockData) blockdir;
+                        block.setBlockData(bd);
+
             		} else {
             			player.sendMessage("No torch to change.");
             		}
@@ -616,6 +652,40 @@ public class CodePadPlayerListener implements Listener {
         
         if(block.getType() == Material.WALL_TORCH){
         	block.setType(Material.REDSTONE_WALL_TORCH);
+
+            // Get sign facing direction
+            BlockFace signFacingDirection = ((Directional) event.getClickedBlock().getBlockData()).getFacing();
+
+            // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+            BlockFace newTorchDir;
+            switch (signFacingDirection) {
+                case NORTH:
+                    newTorchDir = BlockFace.SOUTH;
+                    break;
+
+                case SOUTH:
+                    newTorchDir = BlockFace.NORTH;
+                    break;
+
+                case WEST:
+                    newTorchDir = BlockFace.EAST;
+                    break;
+
+                case EAST:
+                    newTorchDir = BlockFace.WEST;
+                    break;
+
+                default:
+                    newTorchDir = BlockFace.NORTH; // Default torch direction
+                    break;
+            }
+
+            // Update block facing (torch)
+            BlockData bd = block.getBlockData();
+            Directional blockdir = (Directional) bd;
+            blockdir.setFacing(newTorchDir);
+            bd = (BlockData) blockdir;
+            block.setBlockData(bd);
 
         } else {
         	event.getPlayer().sendMessage("No torch to change.");

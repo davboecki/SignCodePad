@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -450,6 +451,41 @@ public class SignCreate implements Listener {
                         	return;
                         }
                         block.setType(Material.WALL_TORCH); // Torch created behind sign onplace
+
+                        // Get sign facing direction
+                        BlockFace signFacingDirection = ((Directional) event.getBlock().getBlockData()).getFacing();
+
+                        // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+                        BlockFace newTorchDir;
+                        switch (signFacingDirection) {
+                            case NORTH:
+                                newTorchDir = BlockFace.SOUTH;
+                                break;
+
+                            case SOUTH:
+                                newTorchDir = BlockFace.NORTH;
+                                break;
+
+                            case WEST:
+                                newTorchDir = BlockFace.EAST;
+                                break;
+
+                            case EAST:
+                                newTorchDir = BlockFace.WEST;
+                                break;
+
+                            default:
+                                newTorchDir = BlockFace.NORTH; // Default torch direction
+                                break;
+                        }
+
+                        // Update block facing (torch)
+                        BlockData bd = block.getBlockData();
+                        Directional blockdir = (Directional) bd;
+                        blockdir.setFacing(newTorchDir);
+                        bd = (BlockData) blockdir;
+                        block.setBlockData(bd);
+
                         if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
                         	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
                         	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
@@ -461,6 +497,40 @@ public class SignCreate implements Listener {
                         		 return;
                         	 }
                         	 blockb.setType(Material.WALL_TORCH); // Torch created behind sign onplace
+
+                             // Get code sign facing direction
+                             BlockFace signFacingDirectionB = ((Directional) event.getBlock().getBlockData()).getFacing();
+
+                             // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+                             BlockFace newTorchDirB;
+                             switch (signFacingDirectionB) {
+                                 case NORTH:
+                                     newTorchDirB = BlockFace.SOUTH;
+                                     break;
+
+                                 case SOUTH:
+                                     newTorchDirB = BlockFace.NORTH;
+                                     break;
+
+                                 case WEST:
+                                     newTorchDirB = BlockFace.EAST;
+                                     break;
+
+                                 case EAST:
+                                     newTorchDirB = BlockFace.WEST;
+                                     break;
+
+                                 default:
+                                     newTorchDirB = BlockFace.NORTH; // Default torch direction
+                                     break;
+                             }
+
+                             // Update block facing (torch)
+                             BlockData bdB = block.getBlockData();
+                             Directional blockdirB = (Directional) bdB;
+                             blockdirB.setFacing(newTorchDirB);
+                             bdB = (BlockData) blockdirB;
+                             blockb.setBlockData(bdB);
                         }
                         plugin.save();
                         event.getPlayer().sendMessage("CodePad Created.");
