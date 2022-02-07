@@ -245,39 +245,16 @@ public class CodePadPlayerListener implements Listener {
                 if (Count > ErrorCount) {
                     Block block = sign.getWorld().getBlockAt((Location) plugin.getSetting(sign.getBlock().getLocation(), "Error-Location"));
             		if(block.getType() == Material.WALL_TORCH){
+                        // Get old torch facing
+                        BlockFace oldTorchFacingDirection = ((Directional) block.getBlockData()).getFacing();
+
+                        // Change Torch type
             			block.setType(Material.REDSTONE_WALL_TORCH);
 
-                        // Get sign facing direction
-                        BlockFace signFacingDirection = ((Directional) sign.getBlock().getBlockData()).getFacing();
-
-                        // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
-                        BlockFace newTorchDir;
-                        switch (signFacingDirection) {
-                            case NORTH:
-                                newTorchDir = BlockFace.SOUTH;
-                                break;
-
-                            case SOUTH:
-                                newTorchDir = BlockFace.NORTH;
-                                break;
-
-                            case WEST:
-                                newTorchDir = BlockFace.EAST;
-                                break;
-
-                            case EAST:
-                                newTorchDir = BlockFace.WEST;
-                                break;
-
-                            default:
-                                newTorchDir = BlockFace.NORTH; // Default torch direction
-                                break;
-                        }
-
-                        // Update block facing (torch)
+                        // Update block facing (new torch)
                         BlockData bd = block.getBlockData();
                         Directional blockdir = (Directional) bd;
-                        blockdir.setFacing(newTorchDir);
+                        blockdir.setFacing(oldTorchFacingDirection);
                         bd = (BlockData) blockdir;
                         block.setBlockData(bd);
 
@@ -651,42 +628,18 @@ public class CodePadPlayerListener implements Listener {
         Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Location"));
         
         if(block.getType() == Material.WALL_TORCH){
-        	block.setType(Material.REDSTONE_WALL_TORCH);
+        	// Get old torch facing
+            BlockFace oldTorchFacingDirection = ((Directional) block.getBlockData()).getFacing();
 
-            // Get sign facing direction
-            BlockFace signFacingDirection = ((Directional) event.getClickedBlock().getBlockData()).getFacing();
+            // Change Torch type
+            block.setType(Material.REDSTONE_WALL_TORCH);
 
-            // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
-            BlockFace newTorchDir;
-            switch (signFacingDirection) {
-                case NORTH:
-                    newTorchDir = BlockFace.SOUTH;
-                    break;
-
-                case SOUTH:
-                    newTorchDir = BlockFace.NORTH;
-                    break;
-
-                case WEST:
-                    newTorchDir = BlockFace.EAST;
-                    break;
-
-                case EAST:
-                    newTorchDir = BlockFace.WEST;
-                    break;
-
-                default:
-                    newTorchDir = BlockFace.NORTH; // Default torch direction
-                    break;
-            }
-
-            // Update block facing (torch)
+            // Update block facing (new torch)
             BlockData bd = block.getBlockData();
             Directional blockdir = (Directional) bd;
-            blockdir.setFacing(newTorchDir);
+            blockdir.setFacing(oldTorchFacingDirection);
             bd = (BlockData) blockdir;
             block.setBlockData(bd);
-
         } else {
         	event.getPlayer().sendMessage("No torch to change.");
         }
