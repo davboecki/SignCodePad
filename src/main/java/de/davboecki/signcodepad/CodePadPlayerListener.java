@@ -7,7 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,65 +53,75 @@ public class CodePadPlayerListener implements Listener {
         double x = -1;
         double z = -1;
 
-        switch ((int) sign.getRawData()) {
+        // Facing:
+        Directional meta = (Directional) sign.getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        switch (facing) {
         //Westen
-        case 2:
+        case NORTH:
             x = signloc.getZ() - playerloc.getZ() + 1;
             z = signloc.getX() - playerloc.getX() + 1;
 
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             x = playerloc.getZ() - signloc.getZ();
             z = playerloc.getX() - signloc.getX();
 
             break;
 
         //Süden
-        case 4:
+        case WEST:
             x = signloc.getX() - playerloc.getX() + 1;
             z = playerloc.getZ() - signloc.getZ();
 
             break;
 
         //Norden
-        case 5:
+        case EAST:
             x = playerloc.getX() - signloc.getX();
             z = signloc.getZ() - playerloc.getZ() + 1;
 
             break;
+        
+        default:
+            break;
         }
 
-        Yaw = getXposSuba(Yaw, (int) sign.getRawData());
+        Yaw = getXposSuba(Yaw, facing);
         x -= 0.12;
 
         //player.sendMessage("X:"+x+"\nZ:"+z);
         return (Math.tan(Math.toRadians(Yaw)) * x) + z;
     }
 
-    private double getXposSuba(double Yaw, int value) {
+    private double getXposSuba(double Yaw, BlockFace value) {
         switch (value) {
         //Westen
-        case 2:
+        case NORTH:
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             Yaw -= 180;
 
             break;
 
         //Süden
-        case 4:
+        case WEST:
             Yaw -= 270;
 
             break;
 
         //Norden
-        case 5:
+        case EAST:
             Yaw -= 90;
 
+            break;
+        
+        default:
             break;
         }
 
@@ -126,9 +138,13 @@ public class CodePadPlayerListener implements Listener {
         double y = -1;
         double z = -1;
 
-        switch ((int) sign.getRawData()) {
+        // Facing:
+        Directional meta = (Directional) sign.getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        switch (facing) {
         //Westen
-        case 2:
+        case NORTH:
             x = signloc.getZ() - playerloc.getZ() + 1;
             y = playerloc.getY() - signloc.getY();
             z = signloc.getX() - playerloc.getX() + 1;
@@ -136,7 +152,7 @@ public class CodePadPlayerListener implements Listener {
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             x = playerloc.getZ() - signloc.getZ();
             y = playerloc.getY() - signloc.getY();
             z = playerloc.getX() - signloc.getX();
@@ -144,7 +160,7 @@ public class CodePadPlayerListener implements Listener {
             break;
 
         //S�den
-        case 4:
+        case WEST:
             x = signloc.getX() - playerloc.getX() + 1;
             y = playerloc.getY() - signloc.getY();
             z = playerloc.getZ() - signloc.getZ();
@@ -152,16 +168,19 @@ public class CodePadPlayerListener implements Listener {
             break;
 
         //Norden
-        case 5:
+        case EAST:
             x = playerloc.getX() - signloc.getX();
             y = playerloc.getY() - signloc.getY();
             z = signloc.getZ() - playerloc.getZ() + 1;
 
             break;
+        
+        default:
+            break;
         }
 
         Pitch = positivgrad(Pitch);
-        Yaw = getXposSuba(Yaw, (int) sign.getRawData());
+        Yaw = getXposSuba(Yaw, facing);
         z -= getXpos(player, sign, signloc);
         y += player.getEyeHeight();
         x -= 0.15;
