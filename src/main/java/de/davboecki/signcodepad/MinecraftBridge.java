@@ -30,15 +30,17 @@ public class MinecraftBridge {
 	public MinecraftBridge() throws PluginOutOfDateException {
 		InputStream craftbukkitPom = null;
 		try {
-			final ZipInputStream craftbukkitJar = new ZipInputStream(new FileInputStream(Bukkit.class.getProtectionDomain().getCodeSource().getLocation()
-					.getPath()));
+			final ZipInputStream craftbukkitJar = new ZipInputStream(
+					new FileInputStream(Bukkit.class.getProtectionDomain().getCodeSource().getLocation()
+							.getPath()));
 			ZipEntry entry;
 			while ((entry = craftbukkitJar.getNextEntry()) != null) {
-				if (entry.getName().equals("META-INF/maven/org.bukkit/craftbukkit/pom.xml")) { // CraftBukkit pom
+				if (entry.getName().equals("META-INF/maven/org.bukkit/craftbukkit/pom.xml")) { // CraftBukkit pom. equals string
+																																												// might be outdated!
 					craftbukkitPom = craftbukkitJar;
 					preCbVersion = "CraftBukkit";
 					break;
-				} else if (entry.getName().equals("META-INF/maven/org.spigotmc/spigot/pom.xml")) { // Supporting Spigot
+				} else if (entry.getName().equals("META-INF/maven/org.spigotmc/spigot-api/pom.xml")) { // Supporting Spigot
 					craftbukkitPom = craftbukkitJar;
 					preCbVersion = "Spigot";
 					break;
@@ -62,9 +64,18 @@ public class MinecraftBridge {
 						break;
 					}
 				}
-				final Element propertiesNodes = (Element) projectNodes.getElementsByTagName("properties").item(0);
-				mcVersion = propertiesNodes.getElementsByTagName("minecraft.version").item(0).getTextContent();
-				mcFolderVersion = "v" + propertiesNodes.getElementsByTagName("minecraft_version").item(0).getTextContent();
+
+				/*
+				 * IMPORTANT:
+				 * mc.version and minecraft_version was null. Using version as Both mcVersion
+				 * and mcFolderVersion!
+				 */
+
+				// final Element propertiesNodes = (Element)
+				// projectNodes.getElementsByTagName("properties").item(0);
+				mcVersion = projectNodes.getElementsByTagName("version").item(0).getTextContent(); // minecraft.version was null... used to be: propertiesNodes.getElementsByTagName("minecraft_version").item(0).getTextContent();
+				// propertiesNodes.getElementsByTagName("minecraft.version").item(0).getTextContent();
+				mcFolderVersion = "v" + projectNodes.getElementsByTagName("version").item(0).getTextContent();
 				craftbukkitJar.close();
 			} else {
 				craftbukkitJar.close();
@@ -118,7 +129,8 @@ public class MinecraftBridge {
 		}
 	}
 
-	public static Object invokeMethod(String aClass, String method, Object instance, Class<?>[] parameterTypes, Object... parameterArgs)
+	public static Object invokeMethod(String aClass, String method, Object instance, Class<?>[] parameterTypes,
+			Object... parameterArgs)
 			throws PluginOutOfDateException {
 		if (aClass != null && method != null) {
 			try {
@@ -161,7 +173,8 @@ public class MinecraftBridge {
 		return null;
 	}
 
-	public static void setField(String aClass, String field, Object instance, Object value) throws PluginOutOfDateException {
+	public static void setField(String aClass, String field, Object instance, Object value)
+			throws PluginOutOfDateException {
 		if (aClass != null && field != null) {
 			boolean accessible = true;
 			boolean finalField = false;
@@ -196,14 +209,16 @@ public class MinecraftBridge {
 			} catch (final NoSuchFieldException e) {
 				throw new PluginOutOfDateException("Could not get field", e);
 			} catch (final SecurityException e) {
-				System.out.println("Failed to access" + (!accessible ? " private" : "") + (finalField ? " final" : "") + " field \"" + field + "\" in "
+				System.out.println("Failed to access" + (!accessible ? " private" : "") + (finalField ? " final" : "")
+						+ " field \"" + field + "\" in "
 						+ aClass);
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public static Object callConstructor(String aClass, Class<?>[] parameterTypes, Object... parameterArgs) throws PluginOutOfDateException {
+	public static Object callConstructor(String aClass, Class<?>[] parameterTypes, Object... parameterArgs)
+			throws PluginOutOfDateException {
 		if (aClass != null) {
 			try {
 				final Class<?> bClass = loadClass(aClass);
