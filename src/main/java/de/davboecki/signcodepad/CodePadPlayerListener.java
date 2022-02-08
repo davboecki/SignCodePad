@@ -215,10 +215,10 @@ public class CodePadPlayerListener implements Listener {
         sign.update(true);
     }
 
-    private void setError(Sign sign, Player player, String Type) {
+    private void setError(PlayerInteractEvent event, Sign sign, Player player, String Type) {
         sign.setLine(0, "1 2 3 |  §cErr ");
         sign.update();
-        new ErrorReset(sign, player).start();
+        new ErrorReset(plugin, event, sign, player).start();
 
         if (Type == "WrongCode") {
             if (((Location) plugin.getSetting(sign.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
@@ -261,7 +261,7 @@ public class CodePadPlayerListener implements Listener {
             		} else {
             			player.sendMessage("No torch to change.");
             		}
-            		new RedstoneTorchReset(block,(int) (Double.parseDouble((String) plugin.getSetting(sign.getBlock().getLocation(), "Error-Delay")) * 1000),sign, player).start();
+            		new RedstoneTorchReset(plugin, event, block,(int) (Double.parseDouble((String) plugin.getSetting(sign.getBlock().getLocation(), "Error-Delay")) * 1000),sign, player).start();
             		Count = 0;
                 }
                 plugin.ErrorCount.put(sign.getBlock().getLocation(), Count);
@@ -571,7 +571,7 @@ public class CodePadPlayerListener implements Listener {
             if (plugin.CodeEnter.containsKey(event.getClickedBlock().getLocation())) {
                 if (plugin.CodeEnter.get(event.getClickedBlock().getLocation()).length() > 3) {
                     event.getPlayer().sendMessage("Overflow.");
-                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "Overflow");
+                    setError(event, (Sign) event.getClickedBlock().getState(), event.getPlayer(), "Overflow");
                     plugin.CodeEnter.put(event.getClickedBlock().getLocation(), "");
                     Sternchen("",(Sign) event.getClickedBlock().getState());
                 } else {
@@ -596,7 +596,7 @@ public class CodePadPlayerListener implements Listener {
 
                 if (!md5.isGen()) {
                     event.getPlayer().sendMessage("Internal Error (MD5)");
-                    setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
+                    setError(event, (Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
                     return;
                 }
                 
@@ -604,7 +604,7 @@ public class CodePadPlayerListener implements Listener {
 
                 if (!md5b.isGen()) {
                     event.getPlayer().sendMessage("Internal Error (MD5)");
-                    setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
+                    setError(event, (Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
                     return;
                 }
                 if (((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5.getValue()) || ((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5b.getValue())) {
@@ -614,10 +614,10 @@ public class CodePadPlayerListener implements Listener {
                 		HandleTorchPad(event);
                 	}
                 } else {
-                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "WrongCode");
+                    setError(event, (Sign) event.getClickedBlock().getState(), event.getPlayer(), "WrongCode");
                 }
             } else {
-                setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "WrongCode");
+                setError(event, (Sign) event.getClickedBlock().getState(),event.getPlayer(), "WrongCode");
             }
             plugin.CodeEnter.put(event.getClickedBlock().getLocation(),"");
             Sternchen("", (Sign) event.getClickedBlock().getState());
@@ -649,12 +649,12 @@ public class CodePadPlayerListener implements Listener {
         sign.update();
         
     	try {
-            new RedstoneTorchReset(block, (int) (Double.parseDouble((String) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+            new RedstoneTorchReset(plugin, event, block, (int) (Double.parseDouble((String) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
         } catch (ClassCastException e) {
             try {
-                new RedstoneTorchReset(block,(int) (((Double) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+                new RedstoneTorchReset(plugin, event, block,(int) (((Double) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
             } catch (ClassCastException ex) {
-                new RedstoneTorchReset(block,(int) (((Integer) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+                new RedstoneTorchReset(plugin, event, block,(int) (((Integer) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
             }
         }
     }
