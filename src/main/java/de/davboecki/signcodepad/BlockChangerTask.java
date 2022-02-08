@@ -20,7 +20,7 @@ public class BlockChangerTask implements Callable {
 					BlockFace oldTorchFacingDirection = ((Directional) block.getBlockData()).getFacing();
 
 					// Change Torch type
-					block.setType(Material.WALL_TORCH);
+					block.setType(Material.TORCH);
 
 					// Update block facing (new torch)
 					BlockData bd = block.getBlockData();
