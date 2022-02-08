@@ -20,6 +20,8 @@ public class SignReseter extends Reseter {
 	public void reset(SignCodePad plugin, PlayerInteractEvent event) {
 		super.reset();
 		event.setCancelled(true);
+
+		// Can't reset sign unless sync task
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {

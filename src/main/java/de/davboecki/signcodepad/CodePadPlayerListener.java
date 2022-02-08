@@ -218,7 +218,7 @@ public class CodePadPlayerListener implements Listener {
     private void setError(PlayerInteractEvent event, Sign sign, Player player, String Type) {
         sign.setLine(0, "1 2 3 |  §cErr ");
         sign.update();
-        new ErrorReset(sign, player).start();
+        new ErrorReset(plugin, event, sign, player).start();
 
         if (Type == "WrongCode") {
             if (((Location) plugin.getSetting(sign.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
