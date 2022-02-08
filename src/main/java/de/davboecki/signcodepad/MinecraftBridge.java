@@ -34,11 +34,11 @@ public class MinecraftBridge {
 					.getPath()));
 			ZipEntry entry;
 			while ((entry = craftbukkitJar.getNextEntry()) != null) {
-				if (entry.getName().equals("META-INF/maven/org.bukkit/craftbukkit/pom.xml")) { // CraftBukkit pom
+				if (entry.getName().equals("META-INF/maven/org.bukkit/craftbukkit/pom.xml")) { // CraftBukkit pom. equals string might be outdated!
 					craftbukkitPom = craftbukkitJar;
 					preCbVersion = "CraftBukkit";
 					break;
-				} else if (entry.getName().equals("META-INF/maven/org.spigotmc/spigot/pom.xml")) { // Supporting Spigot
+				} else if (entry.getName().equals("META-INF/maven/org.spigotmc/spigot-api/pom.xml")) { // Supporting Spigot
 					craftbukkitPom = craftbukkitJar;
 					preCbVersion = "Spigot";
 					break;
@@ -62,9 +62,15 @@ public class MinecraftBridge {
 						break;
 					}
 				}
-				final Element propertiesNodes = (Element) projectNodes.getElementsByTagName("properties").item(0);
-				mcVersion = propertiesNodes.getElementsByTagName("minecraft.version").item(0).getTextContent();
-				mcFolderVersion = "v" + propertiesNodes.getElementsByTagName("minecraft_version").item(0).getTextContent();
+
+				/*
+				IMPORTANT:
+				mc.version and minecraft_version was null. Using version as Both mcVersion and mcFolderVersion!
+				*/
+
+				// final Element propertiesNodes = (Element) projectNodes.getElementsByTagName("properties").item(0);
+				mcVersion = projectNodes.getElementsByTagName("version").item(0).getTextContent(); // minecraft.version was null... used to be: propertiesNodes.getElementsByTagName("minecraft.version").item(0).getTextContent();
+				mcFolderVersion = "v" + projectNodes.getElementsByTagName("version").item(0).getTextContent();// propertiesNodes.getElementsByTagName("minecraft_version").item(0).getTextContent();
 				craftbukkitJar.close();
 			} else {
 				craftbukkitJar.close();
