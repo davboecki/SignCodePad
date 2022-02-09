@@ -287,6 +287,7 @@ public class CodePadPlayerListener implements Listener {
             	} else {
             		handleCalSignNormal(event);
             	}
+                event.setCancelled(true);
             }
             if (plugin.hasSetting(event.getClickedBlock().getLocation())) {
             	handleCodeEnter(event);
