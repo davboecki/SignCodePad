@@ -3,8 +3,6 @@ package de.davboecki.signcodepad;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SignReseter extends Reseter {
@@ -16,7 +14,7 @@ public class SignReseter extends Reseter {
 		sign = psign;
 	}
 	
-	@EventHandler
+
 	public void reset(SignCodePad plugin, PlayerInteractEvent event) {
 		super.reset();
 		event.setCancelled(true);

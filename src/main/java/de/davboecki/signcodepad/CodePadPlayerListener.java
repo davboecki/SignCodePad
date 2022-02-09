@@ -438,7 +438,37 @@ public class CodePadPlayerListener implements Listener {
             		plugin.save();
             	}
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(sign.getType(), 1));
+                Material droppableSign;
+                switch (sign.getType()) {
+                    case OAK_WALL_SIGN:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                    case SPRUCE_WALL_SIGN:
+                        droppableSign = Material.SPRUCE_SIGN;
+                        break;
+                    case BIRCH_WALL_SIGN:
+                        droppableSign = Material.BIRCH_SIGN;
+                        break;
+                    case ACACIA_WALL_SIGN:
+                        droppableSign = Material.ACACIA_SIGN;
+                        break;
+                    case JUNGLE_WALL_SIGN:
+                        droppableSign = Material.JUNGLE_SIGN;
+                        break;
+                    case DARK_OAK_WALL_SIGN:
+                        droppableSign = Material.DARK_OAK_SIGN;
+                        break;
+                    case CRIMSON_WALL_SIGN:
+                        droppableSign = Material.CRIMSON_SIGN;
+                        break;
+                    case WARPED_WALL_SIGN:
+                        droppableSign = Material.WARPED_SIGN;
+                        break;
+                    default:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                }
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(droppableSign, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
@@ -518,7 +548,37 @@ public class CodePadPlayerListener implements Listener {
             }
             if (Calsave.CalNumber >= 4) {
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(sign.getType(), 1));
+                Material droppableSign;
+                switch (sign.getType()) {
+                    case OAK_WALL_SIGN:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                    case SPRUCE_WALL_SIGN:
+                        droppableSign = Material.SPRUCE_SIGN;
+                        break;
+                    case BIRCH_WALL_SIGN:
+                        droppableSign = Material.BIRCH_SIGN;
+                        break;
+                    case ACACIA_WALL_SIGN:
+                        droppableSign = Material.ACACIA_SIGN;
+                        break;
+                    case JUNGLE_WALL_SIGN:
+                        droppableSign = Material.JUNGLE_SIGN;
+                        break;
+                    case DARK_OAK_WALL_SIGN:
+                        droppableSign = Material.DARK_OAK_SIGN;
+                        break;
+                    case CRIMSON_WALL_SIGN:
+                        droppableSign = Material.CRIMSON_SIGN;
+                        break;
+                    case WARPED_WALL_SIGN:
+                        droppableSign = Material.WARPED_SIGN;
+                        break;
+                    default: 
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                }
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(droppableSign, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
