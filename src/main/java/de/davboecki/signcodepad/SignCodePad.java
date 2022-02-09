@@ -134,10 +134,9 @@ public class SignCodePad extends JavaPlugin {
         pm.registerEvents(SignCreate,this);
         pm.registerEvents(WorldListener, this);
 
+        // Load signs
+
         MyYamlConstructor cstr = new MyYamlConstructor(SettingsSave.class);
-        TypeDescription pDesc = new TypeDescription(SettingsSave.class);
-        pDesc.putListPropertyType("Settings", SignLoc.class);
-        cstr.addTypeDescription(pDesc);
         this.yaml = new Yaml(cstr);
 
         FileInputStream pFile;
@@ -156,36 +155,39 @@ public class SignCodePad extends JavaPlugin {
 
         if (SettingsSave != null && SettingsSave.Settings != null) {
             for (Object locObject : SettingsSave.Settings.keySet()) {
-            	SignLoc loc = new SignLoc(locObject);
-            	boolean Valid = true;
+                SignLoc loc = new SignLoc(locObject);
+                boolean Valid = true;
                 for (String key : SettingsSave.Settings.get(locObject).keySet()) {
                     if (SettingsSave.Settings.get(locObject).get(key).getClass() == SignLoc.class) {
-                    	if(getLocation((SignLoc) SettingsSave.Settings.get(locObject).get(key)) == null){Valid = false;break;}
-                        SettingsSave.Settings.get(locObject).put(key,getLocation((SignLoc) SettingsSave.Settings.get(locObject).get(key)));
+                        if (getLocation((SignLoc) SettingsSave.Settings.get(locObject).get(key)) == null) {
+                            Valid = false;
+                            break;
+                        }
+                        SettingsSave.Settings.get(locObject).put(key, getLocation((SignLoc) SettingsSave.Settings.get(locObject).get(key)));
                     }
                 }
                 Location LocationLoc = getLocation(loc);
                 Material t = LocationLoc.getBlock().getType();
-                if(LocationLoc != null && Valid && (t == Material.OAK_WALL_SIGN || t == Material.SPRUCE_WALL_SIGN || t == Material.BIRCH_WALL_SIGN || t == Material.ACACIA_WALL_SIGN || t == Material.JUNGLE_WALL_SIGN || t == Material.DARK_OAK_WALL_SIGN || t == Material.CRIMSON_WALL_SIGN || t == Material.WARPED_WALL_SIGN)){
-                	Settings.put(LocationLoc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
+                if (LocationLoc != null && Valid && (t == Material.OAK_WALL_SIGN || t == Material.SPRUCE_WALL_SIGN || t == Material.BIRCH_WALL_SIGN || t == Material.ACACIA_WALL_SIGN || t == Material.JUNGLE_WALL_SIGN || t == Material.DARK_OAK_WALL_SIGN || t == Material.CRIMSON_WALL_SIGN || t == Material.WARPED_WALL_SIGN)) {
+                    Settings.put(LocationLoc, (HashMap<String, Object>) SettingsSave.Settings.get(locObject));
                 } else {
-                	RemovedSigns.put(loc, (HashMap<String, Object>)SettingsSave.Settings.get(locObject));
+                    RemovedSigns.put(loc, (HashMap<String, Object>) SettingsSave.Settings.get(locObject));
                 }
             }
         }
 
+        // End load signs
+
         //Calibrierung
         MyYamlConstructor cstr_b = new MyYamlConstructor(CalibrationSettings.class);
         TypeDescription pDesc_b = new TypeDescription(CalibrationSettings.class);
-        pDesc.putListPropertyType("CalibrationList", Calibration.class);
+        // pDesc.putListPropertyType("CalibrationList", Calibration.class); // pDesc is removed from load sign
         cstr.addTypeDescription(pDesc_b);
         this.yaml_b = new Yaml(cstr_b);
         try {
-            pFile = new FileInputStream(new File(getDataFolder().getPath() +
-                        "/Calibration.yml"));
+            pFile = new FileInputStream(new File(getDataFolder().getPath() + "/Calibration.yml"));
 
-            CalibrationSettings = (CalibrationSettings) yaml_b.load(new UnicodeReader(
-                        pFile));
+            CalibrationSettings = (CalibrationSettings) yaml_b.load(new UnicodeReader(pFile));
         } catch (FileNotFoundException e) {
             log.warning("[SignCodePad] Could not Load Sign Calibration. File Not Found. (This is normal on first run.)");
         } catch (Exception ex) {
@@ -237,8 +239,7 @@ public class SignCodePad extends JavaPlugin {
         }
 
         try {
-            stream = new FileOutputStream(new File(getDataFolder().getPath() +
-                        "/Signs.yml"));
+            stream = new FileOutputStream(new File(getDataFolder().getPath() + "/Signs.yml"));
 
             OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8");
             this.yaml.dump(SettingsSave, writer);
@@ -256,24 +257,19 @@ public class SignCodePad extends JavaPlugin {
         for (Location loc : Settings.keySet()) {
             for (String key : Settings.Settings.get(loc).keySet()) {
                 if (Settings.Settings.get(loc).get(key).getClass() == SignLoc.class) {
-                    Settings.Settings.get(loc)
-                                     .put(key,
-                        getLocation(
-                            (SignLoc) Settings.Settings.get(loc).get(key)));
+                    Settings.Settings.get(loc).put(key, getLocation((SignLoc) Settings.Settings.get(loc).get(key)));
                 }
             }
         }
 
-        File parent_b = new File(getDataFolder().getPath() +
-                "/Calibration.yml").getParentFile();
+        File parent_b = new File(getDataFolder().getPath() + "/Calibration.yml").getParentFile();
 
         if (parent_b != null) {
             parent_b.mkdirs();
         }
 
         try {
-            stream = new FileOutputStream(new File(getDataFolder().getPath() +
-                        "/Calibration.yml"));
+            stream = new FileOutputStream(new File(getDataFolder().getPath() + "/Calibration.yml"));
 
             OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8");
             if(CalibrationSettings == null){
