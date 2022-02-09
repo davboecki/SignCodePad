@@ -39,6 +39,31 @@ public class SignCreate implements Listener {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
             	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
                 plugin.removeSetting(event.getBlock().getLocation());
+
+                // Remove torch behind sign
+                Location brokenSignLoc = event.getBlock().getLocation();
+                Material possibleTorchLoc1 = event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() + 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).getType();
+                if (possibleTorchLoc1 == Material.WALL_TORCH || possibleTorchLoc1 == Material.REDSTONE_WALL_TORCH) {
+                    event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() + 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).setType(Material.AIR);
+                }
+
+                Material possibleTorchLoc2 = event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() - 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).getType();
+                if (possibleTorchLoc2 == Material.WALL_TORCH || possibleTorchLoc2 == Material.REDSTONE_WALL_TORCH) {
+                    event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() - 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).setType(Material.AIR);
+                }
+
+                Material possibleTorchLoc3 = event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() + 2)).getType();
+                if (possibleTorchLoc3 == Material.WALL_TORCH || possibleTorchLoc3 == Material.REDSTONE_WALL_TORCH) {
+                    event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() + 2)).setType(Material.AIR);
+                }
+
+                Material possibleTorchLoc4 = event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() - 2)).getType();
+                if (possibleTorchLoc4 == Material.WALL_TORCH || possibleTorchLoc4 == Material.REDSTONE_WALL_TORCH) {
+                    event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() - 2)).setType(Material.AIR);
+                }
+                
+                // End Remove torch behind sign
+                
                 event.getPlayer().sendMessage("CodePad Destroyed.");
                 plugin.save();
             	}
