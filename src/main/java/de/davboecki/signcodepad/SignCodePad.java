@@ -178,11 +178,8 @@ public class SignCodePad extends JavaPlugin {
 
         // End load signs
 
-        //Calibrierung
+        // Calibration
         MyYamlConstructor cstr_b = new MyYamlConstructor(CalibrationSettings.class);
-        TypeDescription pDesc_b = new TypeDescription(CalibrationSettings.class);
-        // pDesc.putListPropertyType("CalibrationList", Calibration.class); // pDesc is removed from load sign
-        cstr.addTypeDescription(pDesc_b);
         this.yaml_b = new Yaml(cstr_b);
         try {
             pFile = new FileInputStream(new File(getDataFolder().getPath() + "/Calibration.yml"));

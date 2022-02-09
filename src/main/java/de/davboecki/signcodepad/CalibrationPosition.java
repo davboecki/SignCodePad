@@ -8,6 +8,8 @@ public class CalibrationPosition {
 	public double x2;
 	public double y2;
 	public char c;
+
+	CalibrationPosition() {} // Used by snakeyaml
 	
 	CalibrationPosition(char c,double x1,double y1,double x2,double y2){
 		this.c = c;
