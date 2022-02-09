@@ -55,14 +55,14 @@ public class SignCreate implements Listener {
               	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
                	event.setCancelled(true);
             }
-        }*/ else if (plugin.isLockedBlock(event.getBlock())) { // Don't know if this works...
+        }*/ /*else if (plugin.isLockedBlock(event.getBlock())) { // Don't know if this works...
             event.getPlayer().sendMessage("Please remove the SignCodePad first.");
             event.setCancelled(true);
         } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) { // Don't know if this works...
             event.setCancelled(true);
             event.getPlayer().sendMessage("Please remove the SignCodePad first.");
             event.setCancelled(true);
-        }
+        }*/
     }
     
     @EventHandler()
