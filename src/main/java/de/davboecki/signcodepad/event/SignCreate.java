@@ -46,7 +46,16 @@ public class SignCreate implements Listener {
             		event.setCancelled(true);
             	}
             }
-        } else if (plugin.isLockedBlock(event.getBlock())) { // Don't know if this works...
+        }/* else  //if (plugin.hasSetting(event.getBlock().getLocation())) {
+            
+            // ToDo: Solve BlockBreakEvent null exception on any block break in commented code bellow!
+
+            // Bug exist in this if statement!
+            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
+              	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+               	event.setCancelled(true);
+            }
+        }*/ else if (plugin.isLockedBlock(event.getBlock())) { // Don't know if this works...
             event.getPlayer().sendMessage("Please remove the SignCodePad first.");
             event.setCancelled(true);
         } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) { // Don't know if this works...
@@ -54,23 +63,6 @@ public class SignCreate implements Listener {
             event.getPlayer().sendMessage("Please remove the SignCodePad first.");
             event.setCancelled(true);
         }
-
-        /*
-
-        ToDo: Solve BlockBreakEvent null exception in commented code bellow!
-
-         */
-        
-        /*
-        else //if (plugin.hasSetting(event.getBlock().getLocation())) {
-
-            // Bug exist in this if statement!
-            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
-              	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-               	event.setCancelled(true);
-            //}
-        } 
-        */
     }
     
     @EventHandler()
