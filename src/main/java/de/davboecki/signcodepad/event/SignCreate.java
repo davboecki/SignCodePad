@@ -46,19 +46,31 @@ public class SignCreate implements Listener {
             		event.setCancelled(true);
             	}
             }
-        } else //if (plugin.hasSetting(event.getBlock().getLocation())) {
-            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")*/){
+        } else if (plugin.isLockedBlock(event.getBlock())) { // Don't know if this works...
+            event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+            event.setCancelled(true);
+        } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) { // Don't know if this works...
+            event.setCancelled(true);
+            event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+            event.setCancelled(true);
+        }
+
+        /*
+
+        ToDo: Solve BlockBreakEvent null exception in commented code bellow!
+
+         */
+        
+        /*
+        else //if (plugin.hasSetting(event.getBlock().getLocation())) {
+
+            // Bug exist in this if statement!
+            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
               	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
                	event.setCancelled(true);
             //}
-        } else if (plugin.isLockedBlock(event.getBlock())){
-          	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-           	event.setCancelled(true);
-        } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) {
-        	event.setCancelled(true);
-        	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-           	event.setCancelled(true);
-        }
+        } 
+        */
     }
     
     @EventHandler()
