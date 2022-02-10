@@ -72,7 +72,7 @@ public class SignCreate implements Listener {
             		event.setCancelled(true);
             	}
             }
-        } else if (eBlockMaterial == Material.WALL_TORCH || eBlockMaterial == Material.REDSTONE_WALL_TORCH) {
+        } /* else if (eBlockMaterial == Material.WALL_TORCH || eBlockMaterial == Material.REDSTONE_WALL_TORCH) { // Not compatible with advanced sign code pad...
             Location eLocation = event.getBlock().getLocation();
             Location possibleSignLoc1 = new Location(eLocation.getWorld(), (eLocation.getX() + 2), eLocation.getY(), eLocation.getZ());
             Location possibleSignLoc2 = new Location(eLocation.getWorld(), (eLocation.getX() - 2), eLocation.getY(), eLocation.getZ());
@@ -84,7 +84,7 @@ public class SignCreate implements Listener {
                 event.getPlayer().sendMessage("Please remove the SignCodePad first.");
                 event.setCancelled(true);
             }
-        } else {
+        }*/ else {
             Location eLocation = event.getBlock().getLocation();
             Location possibleSignLoc1 = new Location(eLocation.getWorld(), (eLocation.getX() + 1), eLocation.getY(), eLocation.getZ());
             Location possibleSignLoc2 = new Location(eLocation.getWorld(), (eLocation.getX() - 1), eLocation.getY(), eLocation.getZ());
