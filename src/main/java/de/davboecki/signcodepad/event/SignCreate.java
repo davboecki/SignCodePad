@@ -38,52 +38,31 @@ public class SignCreate implements Listener {
         if (eBlockMaterial == Material.OAK_WALL_SIGN || eBlockMaterial == Material.SPRUCE_WALL_SIGN || eBlockMaterial == Material.BIRCH_WALL_SIGN || eBlockMaterial == Material.ACACIA_WALL_SIGN || eBlockMaterial == Material.JUNGLE_WALL_SIGN || eBlockMaterial == Material.DARK_OAK_WALL_SIGN || eBlockMaterial == Material.CRIMSON_WALL_SIGN || eBlockMaterial == Material.WARPED_WALL_SIGN) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
             	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
-                plugin.removeSetting(event.getBlock().getLocation());
+                    // Remove OK torch
+                    Location okTorch = (Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location");
+                    event.getPlayer().sendMessage("x: " + okTorch.getX() + ", y: " + okTorch.getY() + ", z: " + okTorch.getZ());
+                    event.getBlock().getWorld().getBlockAt(okTorch).setType(Material.AIR);
 
-                // Remove torch behind sign
-                Location brokenSignLoc = event.getBlock().getLocation();
-                Material possibleTorchLoc1 = event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() + 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).getType();
-                if (possibleTorchLoc1 == Material.WALL_TORCH || possibleTorchLoc1 == Material.REDSTONE_WALL_TORCH) {
-                    event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() + 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).setType(Material.AIR);
-                }
+                    // Remove ERR torch
+                    if (okTorch.getY() > 0) {
+                        Location errTorch = (Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location");
+                        event.getBlock().getWorld().getBlockAt(errTorch).setType(Material.AIR);
+                    }
 
-                Material possibleTorchLoc2 = event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() - 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).getType();
-                if (possibleTorchLoc2 == Material.WALL_TORCH || possibleTorchLoc2 == Material.REDSTONE_WALL_TORCH) {
-                    event.getBlock().getWorld().getBlockAt((brokenSignLoc.getBlockX() - 2), brokenSignLoc.getBlockY(), brokenSignLoc.getBlockZ()).setType(Material.AIR);
-                }
+                    // Remove sign setting
+                    plugin.removeSetting(event.getBlock().getLocation());
 
-                Material possibleTorchLoc3 = event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() + 2)).getType();
-                if (possibleTorchLoc3 == Material.WALL_TORCH || possibleTorchLoc3 == Material.REDSTONE_WALL_TORCH) {
-                    event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() + 2)).setType(Material.AIR);
-                }
-
-                Material possibleTorchLoc4 = event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() - 2)).getType();
-                if (possibleTorchLoc4 == Material.WALL_TORCH || possibleTorchLoc4 == Material.REDSTONE_WALL_TORCH) {
-                    event.getBlock().getWorld().getBlockAt(brokenSignLoc.getBlockX(), brokenSignLoc.getBlockY(), (brokenSignLoc.getBlockZ() - 2)).setType(Material.AIR);
-                }
-                
-                // End Remove torch behind sign
-                
-                event.getPlayer().sendMessage("CodePad Destroyed.");
-                plugin.save();
+                    event.getPlayer().sendMessage("CodePad Destroyed.");
+                    plugin.save();
             	}
             	else {
             		event.getPlayer().sendMessage("You do not own this SignCodePad.");
             		event.setCancelled(true);
             	}
             }
-        } /* else if (eBlockMaterial == Material.WALL_TORCH || eBlockMaterial == Material.REDSTONE_WALL_TORCH) { // Not compatible with advanced sign code pad...
-            Location eLocation = event.getBlock().getLocation();
-            Location possibleSignLoc1 = new Location(eLocation.getWorld(), (eLocation.getX() + 2), eLocation.getY(), eLocation.getZ());
-            Location possibleSignLoc2 = new Location(eLocation.getWorld(), (eLocation.getX() - 2), eLocation.getY(), eLocation.getZ());
-            Location possibleSignLoc3 = new Location(eLocation.getWorld(), eLocation.getX(), eLocation.getY(), (eLocation.getBlockZ() + 2));
-            Location possibleSignLoc4 = new Location(eLocation.getWorld(), eLocation.getX(), eLocation.getY(), (eLocation.getBlockZ() - 2));
-
-            // Stops any player from removing torch belonging to signcodepad before removing sign
-            if (plugin.hasSetting(possibleSignLoc1) || plugin.hasSetting(possibleSignLoc2) || plugin.hasSetting(possibleSignLoc3) || plugin.hasSetting(possibleSignLoc4)) { // If sign around block is signcodepad
-                event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-                event.setCancelled(true);
-            }
+        }/* else if ((event.getBlock().getLocation() == plugin.getSetting(event.getBlock().getLocation(), "OK-Location")) || (event.getBlock().getLocation() == plugin.getSetting(event.getBlock().getLocation(), "Error-Location"))) { // Not compatible with advanced sign code pad...
+            event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+            event.setCancelled(true);
         }*/ else {
             Location eLocation = event.getBlock().getLocation();
             Location possibleSignLoc1 = new Location(eLocation.getWorld(), (eLocation.getX() + 1), eLocation.getY(), eLocation.getZ());
@@ -97,21 +76,6 @@ public class SignCreate implements Listener {
                 event.setCancelled(true);
             }
         }
-        
-        /* else  //if (plugin.hasSetting(event.getBlock().getLocation())) {
-            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")){
-                // This if statement cause null exception
-                event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-               	event.setCancelled(true);
-            }
-        }*/ /*else if (plugin.isLockedBlock(event.getBlock())) { // Don't know if this works...
-            event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-            event.setCancelled(true);
-        } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) { // Don't know if this works...
-            event.setCancelled(true);
-            event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-            event.setCancelled(true);
-        }*/
     }
     
     @EventHandler()
