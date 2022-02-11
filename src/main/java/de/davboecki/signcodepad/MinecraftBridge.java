@@ -30,13 +30,10 @@ public class MinecraftBridge {
 	public MinecraftBridge() throws PluginOutOfDateException {
 		InputStream craftbukkitPom = null;
 		try {
-			final ZipInputStream craftbukkitJar = new ZipInputStream(
-					new FileInputStream(Bukkit.class.getProtectionDomain().getCodeSource().getLocation()
-							.getPath()));
+			final ZipInputStream craftbukkitJar = new ZipInputStream(new FileInputStream(Bukkit.class.getProtectionDomain().getCodeSource().getLocation().getPath()));
 			ZipEntry entry;
 			while ((entry = craftbukkitJar.getNextEntry()) != null) {
-				if (entry.getName().equals("META-INF/maven/org.bukkit/craftbukkit/pom.xml")) { // CraftBukkit pom. equals string
-																																												// might be outdated!
+				if (entry.getName().equals("META-INF/maven/org.bukkit/bukkit/pom.xml")) { // CraftBukkit pom. equals string // might be outdated!
 					craftbukkitPom = craftbukkitJar;
 					preCbVersion = "CraftBukkit";
 					break;
@@ -73,13 +70,14 @@ public class MinecraftBridge {
 
 				// final Element propertiesNodes = (Element)
 				// projectNodes.getElementsByTagName("properties").item(0);
-				mcVersion = projectNodes.getElementsByTagName("version").item(0).getTextContent(); // minecraft.version was null... used to be: propertiesNodes.getElementsByTagName("minecraft_version").item(0).getTextContent();
+				// propertiesNodes.getElementsByTagName("minecraft_version").item(0).getTextContent();
+				mcVersion = projectNodes.getElementsByTagName("version").item(0).getTextContent();
 				// propertiesNodes.getElementsByTagName("minecraft.version").item(0).getTextContent();
 				mcFolderVersion = "v" + projectNodes.getElementsByTagName("version").item(0).getTextContent();
 				craftbukkitJar.close();
 			} else {
 				craftbukkitJar.close();
-				throw new PluginOutOfDateException(new FileNotFoundException("META-INF/maven/org.bukkit/craftbukkit/pom.xml"));
+				throw new PluginOutOfDateException(new FileNotFoundException("META-INF/maven/org.bukkit/bukkit/pom.xml"));
 			}
 		} catch (final FileNotFoundException e1) {
 			throw new PluginOutOfDateException("Could not find CraftBukkit jar", e1);
