@@ -41,7 +41,6 @@ public class SignCreate implements Listener {
             	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
                     // Remove OK torch
                     Location okTorch = (Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location");
-                    event.getPlayer().sendMessage("x: " + okTorch.getX() + ", y: " + okTorch.getY() + ", z: " + okTorch.getZ());
                     event.getBlock().getWorld().getBlockAt(okTorch).setType(Material.AIR);
 
                     // Remove ERR torch
