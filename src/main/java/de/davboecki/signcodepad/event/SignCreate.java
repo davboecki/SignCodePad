@@ -64,21 +64,50 @@ public class SignCreate implements Listener {
         } else if (plugin.isSignTorch(eBlock)) {
                 event.getPlayer().sendMessage("Please remove the SignCodePad first.");
                 event.setCancelled(true);
-        } else {
+        } else { // Protect block behind sign
+            // Locations around removed block
+            Location possibleSignLoc1 = new Location(eBlock.getWorld(), (eBlock.getX() + 1), eBlock.getY(), eBlock.getZ());
+            Location possibleSignLoc2 = new Location(eBlock.getWorld(), (eBlock.getX() - 1), eBlock.getY(), eBlock.getZ());
+            Location possibleSignLoc3 = new Location(eBlock.getWorld(), eBlock.getX(), eBlock.getY(), (eBlock.getBlockZ() + 1));
+            Location possibleSignLoc4 = new Location(eBlock.getWorld(), eBlock.getX(), eBlock.getY(), (eBlock.getBlockZ() - 1));
 
-            // Location eLocation = event.getBlock().getLocation();
+            // If signcodepad & facing towards removed block
 
+            if (plugin.hasSetting(possibleSignLoc1)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc1);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.EAST) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                }
+            }
 
-            // Location possibleSignLoc1 = new Location(eLocation.getWorld(), (eLocation.getX() + 1), eLocation.getY(), eLocation.getZ());
-            // Location possibleSignLoc2 = new Location(eLocation.getWorld(), (eLocation.getX() - 1), eLocation.getY(), eLocation.getZ());
-            // Location possibleSignLoc3 = new Location(eLocation.getWorld(), eLocation.getX(), eLocation.getY(), (eLocation.getBlockZ() + 1));
-            // Location possibleSignLoc4 = new Location(eLocation.getWorld(), eLocation.getX(), eLocation.getY(), (eLocation.getBlockZ() - 1));
+            if (plugin.hasSetting(possibleSignLoc2)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc2);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.WEST) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                }
+            }
 
-            // // Stops any player from removing block between torch and sign before removing sign
-            // if (plugin.hasSetting(possibleSignLoc1) || plugin.hasSetting(possibleSignLoc2) || plugin.hasSetting(possibleSignLoc3) || plugin.hasSetting(possibleSignLoc4)) { // If sign around block is signcodepad
-            //     event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-            //     event.setCancelled(true);
-            // }
+            if (plugin.hasSetting(possibleSignLoc3)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc3);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.SOUTH) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                }
+            }
+
+            if (plugin.hasSetting(possibleSignLoc4)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc4);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.NORTH) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                }
+            }
         }
     }
     
