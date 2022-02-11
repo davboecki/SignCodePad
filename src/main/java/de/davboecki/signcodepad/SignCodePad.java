@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -122,6 +123,27 @@ public class SignCodePad extends JavaPlugin {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Checks if a block is an ok or error location.
+
+     * @param blockLoc - Block to check.
+     * @return - If block is sign torch.
+     */
+    public Boolean isSignTorch(Location blockLoc) {
+        for (Location locObj : Settings.keySet()) {
+            Location okLoc = (Location) getSetting(locObj, "OK-Location");
+            Location errLoc = (Location) getSetting(locObj, "Error-Location");
+
+            if (okLoc.equals(blockLoc)) {
+                return true;
+            } else if (errLoc.equals(blockLoc)) {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     public boolean hasPermission(Player player, String node) {
