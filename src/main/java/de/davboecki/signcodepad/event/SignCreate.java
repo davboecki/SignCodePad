@@ -485,6 +485,9 @@ public class SignCreate implements Listener {
                              return;
                         }
                         } catch(Exception e) {
+                            if (plugin.hasSetting(event.getBlock().getLocation())) {
+                                plugin.removeSetting(event.getBlock().getLocation());
+                            }
                         	event.getPlayer().sendMessage("Error while parsing the sign. Did you enter everything correct?");
                         	return;
                         }
