@@ -33,7 +33,7 @@ public class MinecraftBridge {
 			final ZipInputStream craftbukkitJar = new ZipInputStream(new FileInputStream(Bukkit.class.getProtectionDomain().getCodeSource().getLocation().getPath()));
 			ZipEntry entry;
 			while ((entry = craftbukkitJar.getNextEntry()) != null) {
-				if (entry.getName().equals("META-INF/maven/org.bukkit/bukkit/pom.xml")) { // CraftBukkit pom. equals string // might be outdated!
+				if (entry.getName().equals("META-INF/maven/org.bukkit/bukkit/pom.xml")) { // Supporting Spigot
 					craftbukkitPom = craftbukkitJar;
 					preCbVersion = "CraftBukkit";
 					break;
