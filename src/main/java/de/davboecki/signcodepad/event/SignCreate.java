@@ -479,9 +479,13 @@ public class SignCreate implements Listener {
                             .sendMessage("Internal Error (MD5).");
                             return;
                         }
+
+                        String signInputLineTwo = event.getLine(2);
+                        String signInputLineThree = event.getLine(3);
+
                         try {
-                        if (!Zeiledrei(event.getLine(2), event) ||
-                                !Zeilevier(event.getLine(3), event)) {
+                        if (!Zeiledrei(signInputLineTwo, event) ||
+                                !Zeilevier(signInputLineThree, event)) {
                              return;
                         }
                         } catch(Exception e) {
@@ -508,31 +512,47 @@ public class SignCreate implements Listener {
                         }
                         block.setType(Material.WALL_TORCH); // Torch created behind sign onplace
 
-                        // Get sign facing direction
-                        BlockFace signFacingDirection = ((Directional) event.getBlock().getBlockData()).getFacing();
-
                         // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
                         BlockFace newTorchDir;
-                        switch (signFacingDirection) {
-                            case NORTH:
-                                newTorchDir = BlockFace.SOUTH;
-                                break;
 
-                            case SOUTH:
+                        // Set torch facing
+                        String[] okTorchArgs = signInputLineTwo.split(";");
+                        if (okTorchArgs.length == 3) { // Custom blockface
+                            Bukkit.getLogger().info(okTorchArgs[2]);
+                            if (okTorchArgs[2].toLowerCase().equals("")) {
                                 newTorchDir = BlockFace.NORTH;
-                                break;
-
-                            case WEST:
-                                newTorchDir = BlockFace.EAST;
-                                break;
-
-                            case EAST:
+                            } else if (okTorchArgs[2].toLowerCase().equals("s")) {
+                                newTorchDir = BlockFace.SOUTH;
+                            } else if (okTorchArgs[2].toLowerCase().equals("w")) {
                                 newTorchDir = BlockFace.WEST;
-                                break;
+                            } else if (okTorchArgs[2].toLowerCase().equals("e")) {
+                                newTorchDir = BlockFace.EAST;
+                            } else { // = North (default)
+                                newTorchDir = BlockFace.NORTH;
+                            }
+                        } else { // Automatic blockface (same as signcodepad)
+                            BlockFace signFacingDirection = ((Directional) event.getBlock().getBlockData()).getFacing(); // Get sign facing direction
+                            switch (signFacingDirection) {
+                                case NORTH:
+                                    newTorchDir = BlockFace.SOUTH;
+                                    break;
 
-                            default:
-                                newTorchDir = BlockFace.NORTH; // Default torch direction
-                                break;
+                                case SOUTH:
+                                    newTorchDir = BlockFace.NORTH;
+                                    break;
+
+                                case WEST:
+                                    newTorchDir = BlockFace.EAST;
+                                    break;
+
+                                case EAST:
+                                    newTorchDir = BlockFace.WEST;
+                                    break;
+
+                                default:
+                                    newTorchDir = BlockFace.NORTH; // Default torch direction
+                                    break;
+                            }
                         }
 
                         // Update block facing (torch)
@@ -552,35 +572,50 @@ public class SignCreate implements Listener {
                         		 }
                         		 return;
                         	 }
-                        	 blockb.setType(Material.WALL_TORCH); // Torch created behind sign onplace
+                        	    blockb.setType(Material.WALL_TORCH); // Torch created behind sign onplace
 
-                             // Get code sign facing direction
-                             BlockFace signFacingDirectionB = ((Directional) event.getBlock().getBlockData()).getFacing();
+                                // Get code sign facing direction
+                                BlockFace signFacingDirectionB = ((Directional) event.getBlock().getBlockData()).getFacing();
 
-                             // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
-                             BlockFace newTorchDirB;
-                             switch (signFacingDirectionB) {
-                                 case NORTH:
-                                     newTorchDirB = BlockFace.SOUTH;
-                                     break;
+                                // Set torch facing
+                                BlockFace newTorchDirB;
+                                String[] errTorchArgs = signInputLineThree.split(";");
+                                if (errTorchArgs.length == 3) {
+                                    if (errTorchArgs[2].toLowerCase().equals("")) {
+                                        newTorchDirB = BlockFace.NORTH;
+                                    } else if (errTorchArgs[2].toLowerCase().equals("s")) {
+                                        newTorchDirB = BlockFace.SOUTH;
+                                    } else if (errTorchArgs[2].toLowerCase().equals("w")) {
+                                        newTorchDirB = BlockFace.WEST;
+                                    } else if (errTorchArgs[2].toLowerCase().equals("e")) {
+                                        newTorchDirB = BlockFace.EAST;
+                                    } else { // = North (default)
+                                        newTorchDirB = BlockFace.NORTH;
+                                    }
+                                } else {
+                                    // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+                                    switch (signFacingDirectionB) {
+                                        case NORTH:
+                                            newTorchDirB = BlockFace.SOUTH;
+                                            break;
 
-                                 case SOUTH:
-                                     newTorchDirB = BlockFace.NORTH;
-                                     break;
+                                        case SOUTH:
+                                            newTorchDirB = BlockFace.NORTH;
+                                            break;
 
-                                 case WEST:
-                                     newTorchDirB = BlockFace.EAST;
-                                     break;
+                                        case WEST:
+                                            newTorchDirB = BlockFace.EAST;
+                                            break;
 
-                                 case EAST:
-                                     newTorchDirB = BlockFace.WEST;
-                                     break;
+                                        case EAST:
+                                            newTorchDirB = BlockFace.WEST;
+                                            break;
 
-                                 default:
-                                     newTorchDirB = BlockFace.NORTH; // Default torch direction
-                                     break;
-                             }
-
+                                        default:
+                                            newTorchDirB = BlockFace.NORTH; // Default torch direction
+                                            break;
+                                    }
+                            }
                              // Update block facing (torch)
                              BlockData bdB = block.getBlockData();
                              Directional blockdirB = (Directional) bdB;
