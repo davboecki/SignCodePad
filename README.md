@@ -5,7 +5,7 @@ Sign code pad creates interactive code pad signs. The torch behind the sign is r
 ### Calibration (required)
 <img src="./img/img3.png" width="200">
 
-* Create a wall sign
+* Create a wall sign.
 * Write "[SignCodePad]" or "[SCP]" on the first line.
 * Write "cal" on the second line.
 * Press "Done".
@@ -16,7 +16,7 @@ Sign code pad creates interactive code pad signs. The torch behind the sign is r
 ### Advanced Calibration (optional)
 <img src="./img/img4.png" width="200">
 
-* Create a wall sign
+* Create a wall sign.
 * Write "[SignCodePad]" or "[SCP]" on the first line.
 * Write "cal" on the second line.
 * Write "advanced" on the third line
@@ -54,14 +54,23 @@ Sign code pad creates interactive code pad signs. The torch behind the sign is r
 
 An example of the advanced code pad sign above. The left torch is the Error torch and right is the OK torch.
 
+### Installation
+* Add .jar file to plugin folder.
+
+### Permissions
+* signcodepad.use (Permission to use a SignCodePad an the SignCodePad Calibration)[User]
+* signcodepad.create (Permission to create a SignCodePad)[User]
+* signcodepad.replaceblock (Permission to replace a not air block with a torch)[Admin]
+* signcodepad.masterdestroy (Permission to destroy SignCodePads without being the owner)[Admin]
+
 ### Sign code pad
-<img src="./img/img11.png" width="500">
+<img src="./img/img11.png" width="350">
 
 ### Correct code
-<img src="./img/img9.png" width="500">
+<img src="./img/img9.png" width="350">
 
 ### Wrong code
-<img src="./img/img10.png" width="500">
+<img src="./img/img10.png" width="350">
 
 ## License
 
