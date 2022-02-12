@@ -518,7 +518,6 @@ public class SignCreate implements Listener {
                         // Set torch facing
                         String[] okTorchArgs = signInputLineTwo.split(";");
                         if (okTorchArgs.length == 3) { // Custom blockface
-                            Bukkit.getLogger().info(okTorchArgs[2]);
                             if (okTorchArgs[2].toLowerCase().equals("")) {
                                 newTorchDir = BlockFace.NORTH;
                             } else if (okTorchArgs[2].toLowerCase().equals("s")) {
