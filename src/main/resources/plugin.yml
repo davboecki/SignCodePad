@@ -1,8 +1,9 @@
 name: SignCodePad
 main: de.davboecki.signcodepad.SignCodePad
-version: 2.2.0
+version: 2.3.0
 website: http://dev.bukkit.org/server-mods/signcodepad/
 dev-url: http://dev.bukkit.org/server-mods/signcodepad/
+# api-version: 1.18 # ToDo: Not wall torch when using api-version.
 
 permissions:
   signcodepad.*:

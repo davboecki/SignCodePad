@@ -5,6 +5,9 @@ import java.util.concurrent.Callable;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 
 public class BlockChangerTask implements Callable {
 	
@@ -13,7 +16,19 @@ public class BlockChangerTask implements Callable {
 		if(Blocks.size()>0){
 			for(Block block:Blocks.toArray(new Block[Blocks.size()])){
 				try{
-					block.setTypeId(Material.TORCH.getId());
+					// Get sign facing direction
+					BlockFace oldTorchFacingDirection = ((Directional) block.getBlockData()).getFacing();
+
+					// Change Torch type
+					block.setType(Material.TORCH);
+
+					// Update block facing (new torch)
+					BlockData bd = block.getBlockData();
+					Directional blockdir = (Directional) bd;
+					blockdir.setFacing(oldTorchFacingDirection);
+					bd = (BlockData) blockdir;
+					block.setBlockData(bd);
+
 				} catch(Exception e){}
 			}
 			Blocks.clear();

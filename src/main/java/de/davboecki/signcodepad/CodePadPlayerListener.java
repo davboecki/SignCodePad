@@ -7,7 +7,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,65 +54,75 @@ public class CodePadPlayerListener implements Listener {
         double x = -1;
         double z = -1;
 
-        switch ((int) sign.getRawData()) {
+        // Facing:
+        Directional meta = (Directional) sign.getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        switch (facing) {
         //Westen
-        case 2:
+        case NORTH:
             x = signloc.getZ() - playerloc.getZ() + 1;
             z = signloc.getX() - playerloc.getX() + 1;
 
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             x = playerloc.getZ() - signloc.getZ();
             z = playerloc.getX() - signloc.getX();
 
             break;
 
         //Süden
-        case 4:
+        case WEST:
             x = signloc.getX() - playerloc.getX() + 1;
             z = playerloc.getZ() - signloc.getZ();
 
             break;
 
         //Norden
-        case 5:
+        case EAST:
             x = playerloc.getX() - signloc.getX();
             z = signloc.getZ() - playerloc.getZ() + 1;
 
             break;
+        
+        default:
+            break;
         }
 
-        Yaw = getXposSuba(Yaw, (int) sign.getRawData());
+        Yaw = getXposSuba(Yaw, facing);
         x -= 0.12;
 
         //player.sendMessage("X:"+x+"\nZ:"+z);
         return (Math.tan(Math.toRadians(Yaw)) * x) + z;
     }
 
-    private double getXposSuba(double Yaw, int value) {
+    private double getXposSuba(double Yaw, BlockFace value) {
         switch (value) {
         //Westen
-        case 2:
+        case NORTH:
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             Yaw -= 180;
 
             break;
 
         //Süden
-        case 4:
+        case WEST:
             Yaw -= 270;
 
             break;
 
         //Norden
-        case 5:
+        case EAST:
             Yaw -= 90;
 
+            break;
+        
+        default:
             break;
         }
 
@@ -126,9 +139,13 @@ public class CodePadPlayerListener implements Listener {
         double y = -1;
         double z = -1;
 
-        switch ((int) sign.getRawData()) {
+        // Facing:
+        Directional meta = (Directional) sign.getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        switch (facing) {
         //Westen
-        case 2:
+        case NORTH:
             x = signloc.getZ() - playerloc.getZ() + 1;
             y = playerloc.getY() - signloc.getY();
             z = signloc.getX() - playerloc.getX() + 1;
@@ -136,7 +153,7 @@ public class CodePadPlayerListener implements Listener {
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             x = playerloc.getZ() - signloc.getZ();
             y = playerloc.getY() - signloc.getY();
             z = playerloc.getX() - signloc.getX();
@@ -144,7 +161,7 @@ public class CodePadPlayerListener implements Listener {
             break;
 
         //S�den
-        case 4:
+        case WEST:
             x = signloc.getX() - playerloc.getX() + 1;
             y = playerloc.getY() - signloc.getY();
             z = playerloc.getZ() - signloc.getZ();
@@ -152,16 +169,19 @@ public class CodePadPlayerListener implements Listener {
             break;
 
         //Norden
-        case 5:
+        case EAST:
             x = playerloc.getX() - signloc.getX();
             y = playerloc.getY() - signloc.getY();
             z = signloc.getZ() - playerloc.getZ() + 1;
 
             break;
+        
+        default:
+            break;
         }
 
         Pitch = positivgrad(Pitch);
-        Yaw = getXposSuba(Yaw, (int) sign.getRawData());
+        Yaw = getXposSuba(Yaw, facing);
         z -= getXpos(player, sign, signloc);
         y += player.getEyeHeight();
         x -= 0.15;
@@ -195,10 +215,10 @@ public class CodePadPlayerListener implements Listener {
         sign.update(true);
     }
 
-    private void setError(Sign sign, Player player, String Type) {
+    private void setError(PlayerInteractEvent event, Sign sign, Player player, String Type) {
         sign.setLine(0, "1 2 3 |  §cErr ");
         sign.update();
-        new ErrorReset(sign, player).start();
+        new ErrorReset(plugin, event, sign, player).start();
 
         if (Type == "WrongCode") {
             if (((Location) plugin.getSetting(sign.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
@@ -224,12 +244,24 @@ public class CodePadPlayerListener implements Listener {
 
                 if (Count > ErrorCount) {
                     Block block = sign.getWorld().getBlockAt((Location) plugin.getSetting(sign.getBlock().getLocation(), "Error-Location"));
-            		if(block.getTypeId() == Material.TORCH.getId()){
-            			block.setTypeId(Material.REDSTONE_TORCH_ON.getId());
+            		if(block.getType() == Material.WALL_TORCH){
+                        // Get old torch facing
+                        BlockFace oldTorchFacingDirection = ((Directional) block.getBlockData()).getFacing();
+
+                        // Change Torch type
+            			block.setType(Material.REDSTONE_WALL_TORCH);
+
+                        // Update block facing (new torch)
+                        BlockData bd = block.getBlockData();
+                        Directional blockdir = (Directional) bd;
+                        blockdir.setFacing(oldTorchFacingDirection);
+                        bd = (BlockData) blockdir;
+                        block.setBlockData(bd);
+
             		} else {
             			player.sendMessage("No torch to change.");
             		}
-            		new RedstoneTorchReset(block,(int) (Double.parseDouble((String) plugin.getSetting(sign.getBlock().getLocation(), "Error-Delay")) * 1000),sign, player).start();
+            		new RedstoneTorchReset(plugin, event, block,(int) (Double.parseDouble((String) plugin.getSetting(sign.getBlock().getLocation(), "Error-Delay")) * 1000),sign, player).start();
             		Count = 0;
                 }
                 plugin.ErrorCount.put(sign.getBlock().getLocation(), Count);
@@ -241,7 +273,8 @@ public class CodePadPlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
     	if(event.getClickedBlock() == null) return;
     	if(isLocalInteract) return;
-        if (event.getClickedBlock().getTypeId() == Material.WALL_SIGN.getId()) {
+        Material t = event.getClickedBlock().getType();
+        if (t == Material.OAK_WALL_SIGN || t == Material.SPRUCE_WALL_SIGN || t == Material.BIRCH_WALL_SIGN || t == Material.ACACIA_WALL_SIGN || t == Material.JUNGLE_WALL_SIGN || t == Material.DARK_OAK_WALL_SIGN || t == Material.CRIMSON_WALL_SIGN || t == Material.WARPED_WALL_SIGN) {
             if (plugin.CalLoc.containsKey(event.getPlayer().getName())) {
             	if(plugin.CalType.containsKey(event.getPlayer().getName())){
             		if(plugin.CalType.get(event.getPlayer().getName()) == CalTypes.Normal){
@@ -254,6 +287,7 @@ public class CodePadPlayerListener implements Listener {
             	} else {
             		handleCalSignNormal(event);
             	}
+                event.setCancelled(true);
             }
             if (plugin.hasSetting(event.getClickedBlock().getLocation())) {
             	handleCodeEnter(event);
@@ -405,7 +439,37 @@ public class CodePadPlayerListener implements Listener {
             		plugin.save();
             	}
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.SIGN, 1));
+                Material droppableSign;
+                switch (sign.getType()) {
+                    case OAK_WALL_SIGN:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                    case SPRUCE_WALL_SIGN:
+                        droppableSign = Material.SPRUCE_SIGN;
+                        break;
+                    case BIRCH_WALL_SIGN:
+                        droppableSign = Material.BIRCH_SIGN;
+                        break;
+                    case ACACIA_WALL_SIGN:
+                        droppableSign = Material.ACACIA_SIGN;
+                        break;
+                    case JUNGLE_WALL_SIGN:
+                        droppableSign = Material.JUNGLE_SIGN;
+                        break;
+                    case DARK_OAK_WALL_SIGN:
+                        droppableSign = Material.DARK_OAK_SIGN;
+                        break;
+                    case CRIMSON_WALL_SIGN:
+                        droppableSign = Material.CRIMSON_SIGN;
+                        break;
+                    case WARPED_WALL_SIGN:
+                        droppableSign = Material.WARPED_SIGN;
+                        break;
+                    default:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                }
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(droppableSign, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
@@ -485,7 +549,37 @@ public class CodePadPlayerListener implements Listener {
             }
             if (Calsave.CalNumber >= 4) {
                 sign.getBlock().setType(Material.AIR);
-                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(Material.SIGN, 1));
+                Material droppableSign;
+                switch (sign.getType()) {
+                    case OAK_WALL_SIGN:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                    case SPRUCE_WALL_SIGN:
+                        droppableSign = Material.SPRUCE_SIGN;
+                        break;
+                    case BIRCH_WALL_SIGN:
+                        droppableSign = Material.BIRCH_SIGN;
+                        break;
+                    case ACACIA_WALL_SIGN:
+                        droppableSign = Material.ACACIA_SIGN;
+                        break;
+                    case JUNGLE_WALL_SIGN:
+                        droppableSign = Material.JUNGLE_SIGN;
+                        break;
+                    case DARK_OAK_WALL_SIGN:
+                        droppableSign = Material.DARK_OAK_SIGN;
+                        break;
+                    case CRIMSON_WALL_SIGN:
+                        droppableSign = Material.CRIMSON_SIGN;
+                        break;
+                    case WARPED_WALL_SIGN:
+                        droppableSign = Material.WARPED_SIGN;
+                        break;
+                    default: 
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                }
+                sign.getBlock().getLocation().getWorld().dropItem(sign.getBlock().getLocation(),new ItemStack(droppableSign, 1));
                 plugin.CalSaverList.remove(event.getPlayer().getName());
                 plugin.CalLoc.remove(event.getPlayer().getName());
                 plugin.CalType.remove(event.getPlayer().getName());
@@ -538,7 +632,7 @@ public class CodePadPlayerListener implements Listener {
             if (plugin.CodeEnter.containsKey(event.getClickedBlock().getLocation())) {
                 if (plugin.CodeEnter.get(event.getClickedBlock().getLocation()).length() > 3) {
                     event.getPlayer().sendMessage("Overflow.");
-                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "Overflow");
+                    setError(event, (Sign) event.getClickedBlock().getState(), event.getPlayer(), "Overflow");
                     plugin.CodeEnter.put(event.getClickedBlock().getLocation(), "");
                     Sternchen("",(Sign) event.getClickedBlock().getState());
                 } else {
@@ -563,7 +657,7 @@ public class CodePadPlayerListener implements Listener {
 
                 if (!md5.isGen()) {
                     event.getPlayer().sendMessage("Internal Error (MD5)");
-                    setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
+                    setError(event, (Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
                     return;
                 }
                 
@@ -571,7 +665,7 @@ public class CodePadPlayerListener implements Listener {
 
                 if (!md5b.isGen()) {
                     event.getPlayer().sendMessage("Internal Error (MD5)");
-                    setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
+                    setError(event, (Sign) event.getClickedBlock().getState(),event.getPlayer(), "MD5");
                     return;
                 }
                 if (((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5.getValue()) || ((String) plugin.getSetting(event.getClickedBlock().getLocation(), "MD5")).equalsIgnoreCase(md5b.getValue())) {
@@ -581,10 +675,10 @@ public class CodePadPlayerListener implements Listener {
                 		HandleTorchPad(event);
                 	}
                 } else {
-                    setError((Sign) event.getClickedBlock().getState(), event.getPlayer(), "WrongCode");
+                    setError(event, (Sign) event.getClickedBlock().getState(), event.getPlayer(), "WrongCode");
                 }
             } else {
-                setError((Sign) event.getClickedBlock().getState(),event.getPlayer(), "WrongCode");
+                setError(event, (Sign) event.getClickedBlock().getState(),event.getPlayer(), "WrongCode");
             }
             plugin.CodeEnter.put(event.getClickedBlock().getLocation(),"");
             Sternchen("", (Sign) event.getClickedBlock().getState());
@@ -594,9 +688,19 @@ public class CodePadPlayerListener implements Listener {
     private void HandleTorchPad(PlayerInteractEvent event) {
         Block block = event.getClickedBlock().getWorld().getBlockAt((Location) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Location"));
         
-        if(block.getTypeId() == Material.TORCH.getId()){
-        	block.setTypeId(Material.REDSTONE_TORCH_ON.getId());
+        if(block.getType() == Material.WALL_TORCH){
+        	// Get old torch facing
+            BlockFace oldTorchFacingDirection = ((Directional) block.getBlockData()).getFacing();
 
+            // Change Torch type
+            block.setType(Material.REDSTONE_WALL_TORCH);
+
+            // Update block facing (new torch)
+            BlockData bd = block.getBlockData();
+            Directional blockdir = (Directional) bd;
+            blockdir.setFacing(oldTorchFacingDirection);
+            bd = (BlockData) blockdir;
+            block.setBlockData(bd);
         } else {
         	event.getPlayer().sendMessage("No torch to change.");
         }
@@ -606,12 +710,12 @@ public class CodePadPlayerListener implements Listener {
         sign.update();
         
     	try {
-            new RedstoneTorchReset(block, (int) (Double.parseDouble((String) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+            new RedstoneTorchReset(plugin, event, block, (int) (Double.parseDouble((String) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
         } catch (ClassCastException e) {
             try {
-                new RedstoneTorchReset(block,(int) (((Double) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+                new RedstoneTorchReset(plugin, event, block,(int) (((Double) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
             } catch (ClassCastException ex) {
-                new RedstoneTorchReset(block,(int) (((Integer) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
+                new RedstoneTorchReset(plugin, event, block,(int) (((Integer) plugin.getSetting(event.getClickedBlock().getLocation(),"OK-Delay")) * 1000), sign, event.getPlayer()).start();
             }
         }
     }
@@ -625,7 +729,7 @@ public class CodePadPlayerListener implements Listener {
         try {
         	plugin.getServer().getPluginManager().callEvent(interactevent);
         	if(!interactevent.isCancelled()) {
-        		SignCodePad.getInstance().bridge.interactOnBlock(block.getX(), block.getY(), block.getZ(), block.getWorld(), event.getPlayer(), block.getTypeId());
+        		SignCodePad.getInstance().bridge.interactOnBlock(block.getX(), block.getY(), block.getZ(), block.getWorld(), event.getPlayer(), block.getType());
         		//net.minecraft.server.Block.byId[block.getTypeId()].interact(((CraftWorld)block.getWorld()).getHandle(), block.getX(), block.getY(), block.getZ(), ((CraftPlayer)event.getPlayer()).getHandle());
         	}
         } catch(Exception e) {

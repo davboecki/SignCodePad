@@ -2,10 +2,14 @@ package de.davboecki.signcodepad.event;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -30,30 +34,83 @@ public class SignCreate implements Listener {
 
     @EventHandler()
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getTypeId() == Material.WALL_SIGN.getId()) {
+        Material eBlockMaterial = event.getBlock().getType();
+        Location eBlock = event.getBlock().getLocation();
+        if (eBlockMaterial == Material.OAK_WALL_SIGN || eBlockMaterial == Material.SPRUCE_WALL_SIGN || eBlockMaterial == Material.BIRCH_WALL_SIGN || eBlockMaterial == Material.ACACIA_WALL_SIGN || eBlockMaterial == Material.JUNGLE_WALL_SIGN || eBlockMaterial == Material.DARK_OAK_WALL_SIGN || eBlockMaterial == Material.CRIMSON_WALL_SIGN || eBlockMaterial == Material.WARPED_WALL_SIGN) {
             if (plugin.hasSetting(event.getBlock().getLocation())) {
             	if(((String)plugin.getSetting(event.getBlock().getLocation(), "Owner")).equalsIgnoreCase(event.getPlayer().getName()) || plugin.hasPermission(event.getPlayer(), "signcodepad.masterdestroy")){
-                plugin.removeSetting(event.getBlock().getLocation());
-                event.getPlayer().sendMessage("CodePad Destroyed.");
-                plugin.save();
+                    // Remove OK torch
+                    Location okTorch = (Location) plugin.getSetting(event.getBlock().getLocation(), "OK-Location");
+                    event.getBlock().getWorld().getBlockAt(okTorch).setType(Material.AIR);
+
+                    // Remove ERR torch
+                    if (okTorch.getY() > 0) {
+                        Location errTorch = (Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location");
+                        event.getBlock().getWorld().getBlockAt(errTorch).setType(Material.AIR);
+                    }
+
+                    // Remove sign setting
+                    plugin.removeSetting(event.getBlock().getLocation());
+
+                    event.getPlayer().sendMessage("CodePad Destroyed.");
+                    plugin.save();
             	}
             	else {
             		event.getPlayer().sendMessage("You do not own this SignCodePad.");
             		event.setCancelled(true);
             	}
             }
-        } else //if (plugin.hasSetting(event.getBlock().getLocation())) {
-            if(getSignOnBlock(event.getBlock()) != null && plugin.hasSetting(getSignOnBlock(event.getBlock()).getLocation()) /* && !plugin.hasPermission(event.getPlayer(), "SignCodePad.masterdestroy")*/){
-              	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-               	event.setCancelled(true);
-            //}
-        } else if (plugin.isLockedBlock(event.getBlock())){
-          	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-           	event.setCancelled(true);
-        } else if (plugin.getNearChest(event.getBlock()) != null && plugin.isLockedBlock(plugin.getNearChest(event.getBlock()))) {
-        	event.setCancelled(true);
-        	event.getPlayer().sendMessage("Please remove the SignCodePad first.");
-           	event.setCancelled(true);
+        } else if (plugin.isSignTorch(eBlock)) {
+                event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                event.setCancelled(true);
+        } else { // Protect block behind sign and codepad torches
+            // Locations around removed block
+            Location possibleSignLoc1 = new Location(eBlock.getWorld(), (eBlock.getX() + 1), eBlock.getY(), eBlock.getZ());
+            Location possibleSignLoc2 = new Location(eBlock.getWorld(), (eBlock.getX() - 1), eBlock.getY(), eBlock.getZ());
+            Location possibleSignLoc3 = new Location(eBlock.getWorld(), eBlock.getX(), eBlock.getY(), (eBlock.getBlockZ() + 1));
+            Location possibleSignLoc4 = new Location(eBlock.getWorld(), eBlock.getX(), eBlock.getY(), (eBlock.getBlockZ() - 1));
+
+            // Protect block behind signcodepad, OK-Location and Error-Location
+
+            if (plugin.hasSetting(possibleSignLoc1) || plugin.isSignTorch(possibleSignLoc1)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc1);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.EAST) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (plugin.hasSetting(possibleSignLoc2) || plugin.isSignTorch(possibleSignLoc2)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc2);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.WEST) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (plugin.hasSetting(possibleSignLoc3) || plugin.isSignTorch(possibleSignLoc3)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc3);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.SOUTH) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (plugin.hasSetting(possibleSignLoc4) || plugin.isSignTorch(possibleSignLoc4)) {
+                Block b = event.getBlock().getWorld().getBlockAt(possibleSignLoc4);
+                Directional d = (Directional) b.getBlockData();
+                if (d.getFacing() == BlockFace.NORTH) {
+                    event.getPlayer().sendMessage("Please remove the SignCodePad first.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
     }
     
@@ -102,17 +159,26 @@ public class SignCreate implements Listener {
     private Block getSignOnBlock(Block block){
     	Location loc = block.getLocation();
     	Block b;
-        if((b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
-        	if(((Sign)b.getState()).getRawData() == 5)
+        Material ifOne = (b = new Location(loc.getWorld(),loc.getX()+1,loc.getY(),loc.getZ()).getBlock()).getType();
+        Material ifTwo = (b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getType();
+        Material ifThree = (b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getType();
+        Material ifFour = (b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getType();
+        
+        // Facing:
+        Directional meta = (Directional) (b.getState()).getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        if(ifOne == Material.OAK_WALL_SIGN || ifOne == Material.SPRUCE_WALL_SIGN || ifOne == Material.BIRCH_WALL_SIGN || ifOne == Material.ACACIA_WALL_SIGN || ifOne == Material.JUNGLE_WALL_SIGN || ifOne == Material.DARK_OAK_WALL_SIGN || ifOne == Material.CRIMSON_WALL_SIGN || ifOne == Material.WARPED_WALL_SIGN)
+            if(facing == BlockFace.EAST)
         		return b; 
-        if((b = new Location(loc.getWorld(),loc.getX()-1,loc.getY(),loc.getZ()).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
-            if(((Sign)b.getState()).getRawData() == 4)
+        if(ifTwo == Material.OAK_WALL_SIGN || ifTwo == Material.SPRUCE_WALL_SIGN || ifTwo == Material.BIRCH_WALL_SIGN || ifTwo == Material.ACACIA_WALL_SIGN || ifTwo == Material.JUNGLE_WALL_SIGN || ifTwo == Material.DARK_OAK_WALL_SIGN || ifTwo == Material.CRIMSON_WALL_SIGN || ifTwo == Material.WARPED_WALL_SIGN)
+            if(facing == BlockFace.WEST)
             	return b;
-        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()+1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
-            if(((Sign)b.getState()).getRawData() == 3)
+        if(ifThree == Material.OAK_WALL_SIGN || ifThree == Material.SPRUCE_WALL_SIGN || ifThree == Material.BIRCH_WALL_SIGN || ifThree == Material.ACACIA_WALL_SIGN || ifThree == Material.JUNGLE_WALL_SIGN || ifThree == Material.DARK_OAK_WALL_SIGN || ifThree == Material.CRIMSON_WALL_SIGN || ifThree == Material.WARPED_WALL_SIGN)
+            if(facing == BlockFace.SOUTH)
             	return b;
-        if((b = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ()-1).getBlock()).getTypeId() == Material.WALL_SIGN.getId())
-            if(((Sign)b.getState()).getRawData() == 2)
+        if(ifFour == Material.OAK_WALL_SIGN || ifFour == Material.SPRUCE_WALL_SIGN || ifFour == Material.BIRCH_WALL_SIGN || ifFour == Material.ACACIA_WALL_SIGN || ifFour == Material.JUNGLE_WALL_SIGN || ifFour == Material.DARK_OAK_WALL_SIGN || ifFour == Material.CRIMSON_WALL_SIGN || ifFour == Material.WARPED_WALL_SIGN)
+            if(facing == BlockFace.NORTH)
             	return b;
     	return null;
     }
@@ -123,43 +189,50 @@ public class SignCreate implements Listener {
         double y = signloc.getY();
         double z = -1;
 
-        switch ((int) sign.getRawData()) {
+        // Facing:
+        Directional meta = (Directional) sign.getBlockData();
+        BlockFace facing = meta.getFacing();
+
+        switch (facing) { // Don't ask why directions doesn't match with ENUM :/
         //Westen
-        case 2:
+        case NORTH:
             x = signloc.getX();
             z = signloc.getZ() + 2;
 
             break;
 
         //Osten
-        case 3:
+        case SOUTH:
             x = signloc.getX();
             z = signloc.getZ() - 2;
 
             break;
 
         //S�den
-        case 4:
+        case WEST:
             x = signloc.getX() + 2;
             z = signloc.getZ();
 
             break;
 
         //Norden
-        case 5:
+        case EAST:
             x = signloc.getX() - 2;
             z = signloc.getZ();
 
             break;
+
+        default:
+            break;
         }
 
-        return sign.getBlock().getWorld()
-                   .getBlockAt(new Location(sign.getBlock().getWorld(), x, y, z));
+        return sign.getBlock().getWorld().getBlockAt(new Location(sign.getBlock().getWorld(), x, y, z));
     }
 
     @EventHandler()
     public void onSignChange(SignChangeEvent event) {
-    	if (event.getBlock().getTypeId() == Material.SIGN_POST.getId()){
+        Material t = event.getBlock().getType();
+    	if (t == Material.OAK_SIGN || t == Material.SPRUCE_SIGN || t == Material.BIRCH_SIGN || t == Material.ACACIA_SIGN || t == Material.JUNGLE_SIGN || t == Material.DARK_OAK_SIGN || t == Material.CRIMSON_SIGN || t == Material.WARPED_SIGN){
     		if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
     			event.setLine(0, "Please");
                 event.setLine(1, "create");
@@ -167,14 +240,45 @@ public class SignCreate implements Listener {
                 event.setLine(3, "wallsign");
     		}
     	}
-    	if (event.getBlock().getTypeId() != Material.WALL_SIGN.getId()) return;
-    	 if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
+        
+        if (t != Material.OAK_WALL_SIGN && t != Material.SPRUCE_WALL_SIGN && t != Material.BIRCH_WALL_SIGN && t != Material.ACACIA_WALL_SIGN && t != Material.JUNGLE_WALL_SIGN && t != Material.DARK_OAK_WALL_SIGN && t != Material.CRIMSON_WALL_SIGN && t != Material.WARPED_WALL_SIGN) return;
+         if (event.getLine(0).equalsIgnoreCase("[SignCodePad]") || event.getLine(0).equalsIgnoreCase("[SCP]")) {
         	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
         		event.getBlock().setType(Material.AIR);
-                event.getBlock().getLocation().getWorld()
-                    .dropItem(event.getBlock().getLocation(),
-                    new ItemStack(Material.SIGN, 1));
+
+                // Convert to droppable sign
+                Material droppableSign;
+                switch (event.getBlock().getType()) {
+                    case OAK_WALL_SIGN:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                    case SPRUCE_WALL_SIGN:
+                        droppableSign = Material.SPRUCE_SIGN;
+                        break;
+                    case BIRCH_WALL_SIGN:
+                        droppableSign = Material.BIRCH_SIGN;
+                        break;
+                    case ACACIA_WALL_SIGN:
+                        droppableSign = Material.ACACIA_SIGN;
+                        break;
+                    case JUNGLE_WALL_SIGN:
+                        droppableSign = Material.JUNGLE_SIGN;
+                        break;
+                    case DARK_OAK_WALL_SIGN:
+                        droppableSign = Material.DARK_OAK_SIGN;
+                        break;
+                    case CRIMSON_WALL_SIGN:
+                        droppableSign = Material.CRIMSON_SIGN;
+                        break;
+                    case WARPED_WALL_SIGN:
+                        droppableSign = Material.WARPED_SIGN;
+                        break;
+                    default:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                }
+                event.getBlock().getLocation().getWorld().dropItem(event.getBlock().getLocation(),new ItemStack(droppableSign, 1));
         		return;
         	}
         	if (event.getLine(1).equalsIgnoreCase("Cal") && event.getLine(2).equalsIgnoreCase("")) {
@@ -202,15 +306,15 @@ public class SignCreate implements Listener {
             	ArrayList<Integer> Lockable = new ArrayList<Integer>();
             	Lockable.add(Material.CHEST.getId());
             	Lockable.add(Material.FURNACE.getId());
-            	Lockable.add(Material.BURNING_FURNACE.getId());
-            	Lockable.add(Material.WORKBENCH.getId());
+            	Lockable.add(Material.LEGACY_BURNING_FURNACE.getId());
+            	Lockable.add(Material.LEGACY_WORKBENCH.getId());
             	Lockable.add(Material.LEVER.getId());
             	Lockable.add(Material.DISPENSER.getId());
             	Lockable.add(Material.ANVIL.getId());
             	Lockable.add(Material.DROPPER.getId());
             	
             	
-            	if(!Lockable.contains(loc.getBlock().getTypeId())) {
+            	if(!Lockable.contains(loc.getBlock().getType())) {
             		event.getPlayer().sendMessage("No lockable block under sign.");
             		return;
             	}
@@ -312,21 +416,21 @@ public class SignCreate implements Listener {
 	                	}
                 	}
                 	Block sign = signpos.getBlock();
-                	if(sign.getTypeId() != 0) {
+                	if(sign.getType() != Material.AIR) {
                 		event.getPlayer().sendMessage("[SignCodePad] The block in front of the lockable block is not air.");
                 		return;
                 	} else {
                 		event.setCancelled(true);
                 	}
-                	sign.setTypeId(Material.WALL_SIGN.getId());
+                	sign.setType(event.getBlock().getType());
                 	
                 	if(ChangeDataValue) {
-                		sign.setData(chest.getData());
+                		sign.setBlockData(chest.getBlockData());
                 	} else {
-                		sign.setData(event.getBlock().getData());
+                		sign.setBlockData(event.getBlock().getBlockData());
                 	}
 
-                    event.getBlock().setTypeId(0);
+                    event.getBlock().setType(Material.AIR);
                 	
                     plugin.setSetting(sign.getLocation(),"MD5", md5b.getValue());
                     plugin.setSetting(sign.getLocation(), "Owner",event.getPlayer().getName());
@@ -349,9 +453,39 @@ public class SignCreate implements Listener {
             	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.create")){
             		event.getPlayer().sendMessage("You do not have Permission to do that.");
                     event.getBlock().setType(Material.AIR);
-                    event.getBlock().getLocation().getWorld()
-                        .dropItem(event.getBlock().getLocation(),
-                        new ItemStack(Material.SIGN, 1));
+
+                    // Convert to droppable sign
+                    Material droppableSign;
+                    switch (event.getBlock().getType()) {
+                        case OAK_WALL_SIGN:
+                            droppableSign = Material.OAK_SIGN;
+                            break;
+                        case SPRUCE_WALL_SIGN:
+                            droppableSign = Material.SPRUCE_SIGN;
+                            break;
+                        case BIRCH_WALL_SIGN:
+                            droppableSign = Material.BIRCH_SIGN;
+                            break;
+                        case ACACIA_WALL_SIGN:
+                            droppableSign = Material.ACACIA_SIGN;
+                            break;
+                        case JUNGLE_WALL_SIGN:
+                            droppableSign = Material.JUNGLE_SIGN;
+                            break;
+                        case DARK_OAK_WALL_SIGN:
+                            droppableSign = Material.DARK_OAK_SIGN;
+                            break;
+                        case CRIMSON_WALL_SIGN:
+                            droppableSign = Material.CRIMSON_SIGN;
+                            break;
+                        case WARPED_WALL_SIGN:
+                            droppableSign = Material.WARPED_SIGN;
+                            break;
+                        default:
+                            droppableSign = Material.OAK_SIGN;
+                            break;
+                    }
+                    event.getBlock().getLocation().getWorld().dropItem(event.getBlock().getLocation(), new ItemStack(droppableSign, 1));
             		return;
             	}
                 boolean Worked = true;
@@ -405,12 +539,19 @@ public class SignCreate implements Listener {
                             .sendMessage("Internal Error (MD5).");
                             return;
                         }
+
+                        String signInputLineTwo = event.getLine(2);
+                        String signInputLineThree = event.getLine(3);
+
                         try {
-                        if (!Zeiledrei(event.getLine(2), event) ||
-                                !Zeilevier(event.getLine(3), event)) {
+                        if (!Zeiledrei(signInputLineTwo, event) ||
+                                !Zeilevier(signInputLineThree, event)) {
                              return;
                         }
                         } catch(Exception e) {
+                            if (plugin.hasSetting(event.getBlock().getLocation())) {
+                                plugin.removeSetting(event.getBlock().getLocation());
+                            }
                         	event.getPlayer().sendMessage("Error while parsing the sign. Did you enter everything correct?");
                         	return;
                         }
@@ -429,7 +570,57 @@ public class SignCreate implements Listener {
                         	}
                         	return;
                         }
-                        block.setTypeId(Material.TORCH.getId());
+                        block.setType(Material.WALL_TORCH); // Torch created behind sign onplace
+
+                        // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+                        BlockFace newTorchDir;
+
+                        // Set torch facing
+                        String[] okTorchArgs = signInputLineTwo.split(";");
+                        if (okTorchArgs.length == 3) { // Custom blockface
+                            if (okTorchArgs[2].toLowerCase().equals("")) {
+                                newTorchDir = BlockFace.NORTH;
+                            } else if (okTorchArgs[2].toLowerCase().equals("s")) {
+                                newTorchDir = BlockFace.SOUTH;
+                            } else if (okTorchArgs[2].toLowerCase().equals("w")) {
+                                newTorchDir = BlockFace.WEST;
+                            } else if (okTorchArgs[2].toLowerCase().equals("e")) {
+                                newTorchDir = BlockFace.EAST;
+                            } else { // = North (default)
+                                newTorchDir = BlockFace.NORTH;
+                            }
+                        } else { // Automatic blockface (same as signcodepad)
+                            BlockFace signFacingDirection = ((Directional) event.getBlock().getBlockData()).getFacing(); // Get sign facing direction
+                            switch (signFacingDirection) {
+                                case NORTH:
+                                    newTorchDir = BlockFace.SOUTH;
+                                    break;
+
+                                case SOUTH:
+                                    newTorchDir = BlockFace.NORTH;
+                                    break;
+
+                                case WEST:
+                                    newTorchDir = BlockFace.EAST;
+                                    break;
+
+                                case EAST:
+                                    newTorchDir = BlockFace.WEST;
+                                    break;
+
+                                default:
+                                    newTorchDir = BlockFace.NORTH; // Default torch direction
+                                    break;
+                            }
+                        }
+
+                        // Update block facing (torch)
+                        BlockData bd = block.getBlockData();
+                        Directional blockdir = (Directional) bd;
+                        blockdir.setFacing(newTorchDir);
+                        bd = (BlockData) blockdir;
+                        block.setBlockData(bd);
+
                         if (((Location) plugin.getSetting(event.getBlock().getLocation(),"Error-Location")).getY() >= 0) {
                         	 Block blockb = event.getPlayer().getWorld().getBlockAt((Location) plugin.getSetting(event.getBlock().getLocation(), "Error-Location"));
                         	 if(blockb.getType() != Material.AIR&&!plugin.hasPermission(event.getPlayer(),"signcodepad.replaceblock")){
@@ -440,7 +631,56 @@ public class SignCreate implements Listener {
                         		 }
                         		 return;
                         	 }
-                        	 blockb.setTypeId(Material.TORCH.getId());
+                        	    blockb.setType(Material.WALL_TORCH); // Torch created behind sign onplace
+
+                                // Get code sign facing direction
+                                BlockFace signFacingDirectionB = ((Directional) event.getBlock().getBlockData()).getFacing();
+
+                                // Set torch facing
+                                BlockFace newTorchDirB;
+                                String[] errTorchArgs = signInputLineThree.split(";");
+                                if (errTorchArgs.length == 3) {
+                                    if (errTorchArgs[2].toLowerCase().equals("")) {
+                                        newTorchDirB = BlockFace.NORTH;
+                                    } else if (errTorchArgs[2].toLowerCase().equals("s")) {
+                                        newTorchDirB = BlockFace.SOUTH;
+                                    } else if (errTorchArgs[2].toLowerCase().equals("w")) {
+                                        newTorchDirB = BlockFace.WEST;
+                                    } else if (errTorchArgs[2].toLowerCase().equals("e")) {
+                                        newTorchDirB = BlockFace.EAST;
+                                    } else { // = North (default)
+                                        newTorchDirB = BlockFace.NORTH;
+                                    }
+                                } else {
+                                    // Set oppsite direction for torch (to attach wall torch to same block as wall sign)
+                                    switch (signFacingDirectionB) {
+                                        case NORTH:
+                                            newTorchDirB = BlockFace.SOUTH;
+                                            break;
+
+                                        case SOUTH:
+                                            newTorchDirB = BlockFace.NORTH;
+                                            break;
+
+                                        case WEST:
+                                            newTorchDirB = BlockFace.EAST;
+                                            break;
+
+                                        case EAST:
+                                            newTorchDirB = BlockFace.WEST;
+                                            break;
+
+                                        default:
+                                            newTorchDirB = BlockFace.NORTH; // Default torch direction
+                                            break;
+                                    }
+                            }
+                             // Update block facing (torch)
+                             BlockData bdB = block.getBlockData();
+                             Directional blockdirB = (Directional) bdB;
+                             blockdirB.setFacing(newTorchDirB);
+                             bdB = (BlockData) blockdirB;
+                             blockb.setBlockData(bdB);
                         }
                         plugin.save();
                         event.getPlayer().sendMessage("CodePad Created.");
@@ -501,34 +741,41 @@ public class SignCreate implements Listener {
             double y = blockloc.getY() + Integer.parseInt(loc[1]);
             double z = blockloc.getZ();
 
-            switch ((int) ((Sign) event.getBlock().getState()).getRawData()) {
-            //Westen
-            case 2:
-                x += (Integer.parseInt(loc[2]) * -1);
-                z += Integer.parseInt(loc[0]);
+            // Facing:
+            Directional meta = (Directional) (event.getBlock().getState()).getBlockData();
+            BlockFace facing = meta.getFacing();
 
-                break;
+            switch (facing) { // Don't ask why directions doesn't match with ENUM :/
+                // Westen
+                case NORTH:
+                    x += (Integer.parseInt(loc[2]) * -1);
+                    z += Integer.parseInt(loc[0]);
 
-            //Osten
-            case 3:
-                x += Integer.parseInt(loc[2]);
-                z += (Integer.parseInt(loc[0]) * -1);
+                    break;
 
-                break;
+                // Osten
+                case SOUTH:
+                    x += Integer.parseInt(loc[2]);
+                    z += (Integer.parseInt(loc[0]) * -1);
 
-            //S�den
-            case 4:
-                x += Integer.parseInt(loc[0]);
-                z += Integer.parseInt(loc[2]);
+                    break;
 
-                break;
+                // S�den
+                case WEST:
+                    x += Integer.parseInt(loc[0]);
+                    z += Integer.parseInt(loc[2]);
 
-            //Norden
-            case 5:
-                x += (Integer.parseInt(loc[0]) * -1);
-                z += (Integer.parseInt(loc[2]) * -1);
+                    break;
 
-                break;
+                // Norden
+                case EAST:
+                    x += (Integer.parseInt(loc[0]) * -1);
+                    z += (Integer.parseInt(loc[2]) * -1);
+
+                    break;
+
+                default:
+                    break;
             }
 
             plugin.setSetting(event.getBlock().getLocation(), "OK-Location",
@@ -575,34 +822,41 @@ public class SignCreate implements Listener {
             double y = blockloc.getY() + Integer.parseInt(loc[1]);
             double z = blockloc.getZ();
 
-            switch ((int) ((Sign) event.getBlock().getState()).getRawData()) {
-            //Westen
-            case 2:
-                x += (Integer.parseInt(loc[2]) * -1);
-                z += Integer.parseInt(loc[0]);
+            // Facing:
+            Directional meta = (Directional) (event.getBlock().getState()).getBlockData();
+            BlockFace facing = meta.getFacing();
 
-                break;
+            switch (facing) { // Don't ask why directions doesn't match with ENUM :/
+                // Westen
+                case NORTH:
+                    x += (Integer.parseInt(loc[2]) * -1);
+                    z += Integer.parseInt(loc[0]);
 
-            //Osten
-            case 3:
-                x += Integer.parseInt(loc[2]);
-                z += (Integer.parseInt(loc[0]) * -1);
+                    break;
 
-                break;
+                // Osten
+                case SOUTH:
+                    x += Integer.parseInt(loc[2]);
+                    z += (Integer.parseInt(loc[0]) * -1);
 
-            //S�den
-            case 4:
-                x += Integer.parseInt(loc[0]);
-                z += Integer.parseInt(loc[2]);
+                    break;
 
-                break;
+                // S�den
+                case WEST:
+                    x += Integer.parseInt(loc[0]);
+                    z += Integer.parseInt(loc[2]);
 
-            //Norden
-            case 5:
-                x += (Integer.parseInt(loc[0]) * -1);
-                z += (Integer.parseInt(loc[2]) * -1);
+                    break;
 
-                break;
+                // Norden
+                case EAST:
+                    x += (Integer.parseInt(loc[0]) * -1);
+                    z += (Integer.parseInt(loc[2]) * -1);
+
+                    break;
+
+                default:
+                    break;
             }
 
             plugin.setSetting(event.getBlock().getLocation(), "Error-Location",
