@@ -2,6 +2,7 @@ package de.davboecki.signcodepad.event;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -245,9 +246,39 @@ public class SignCreate implements Listener {
         	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.use")){
         		event.getPlayer().sendMessage("You do not have Permission to do that.");
         		event.getBlock().setType(Material.AIR);
-                event.getBlock().getLocation().getWorld()
-                    .dropItem(event.getBlock().getLocation(),
-                    new ItemStack(event.getBlock().getType(), 1));
+
+                // Convert to droppable sign
+                Material droppableSign;
+                switch (event.getBlock().getType()) {
+                    case OAK_WALL_SIGN:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                    case SPRUCE_WALL_SIGN:
+                        droppableSign = Material.SPRUCE_SIGN;
+                        break;
+                    case BIRCH_WALL_SIGN:
+                        droppableSign = Material.BIRCH_SIGN;
+                        break;
+                    case ACACIA_WALL_SIGN:
+                        droppableSign = Material.ACACIA_SIGN;
+                        break;
+                    case JUNGLE_WALL_SIGN:
+                        droppableSign = Material.JUNGLE_SIGN;
+                        break;
+                    case DARK_OAK_WALL_SIGN:
+                        droppableSign = Material.DARK_OAK_SIGN;
+                        break;
+                    case CRIMSON_WALL_SIGN:
+                        droppableSign = Material.CRIMSON_SIGN;
+                        break;
+                    case WARPED_WALL_SIGN:
+                        droppableSign = Material.WARPED_SIGN;
+                        break;
+                    default:
+                        droppableSign = Material.OAK_SIGN;
+                        break;
+                }
+                event.getBlock().getLocation().getWorld().dropItem(event.getBlock().getLocation(),new ItemStack(droppableSign, 1));
         		return;
         	}
         	if (event.getLine(1).equalsIgnoreCase("Cal") && event.getLine(2).equalsIgnoreCase("")) {
@@ -422,9 +453,39 @@ public class SignCreate implements Listener {
             	if(!plugin.hasPermission(event.getPlayer(), "signcodepad.create")){
             		event.getPlayer().sendMessage("You do not have Permission to do that.");
                     event.getBlock().setType(Material.AIR);
-                    event.getBlock().getLocation().getWorld()
-                        .dropItem(event.getBlock().getLocation(),
-                        new ItemStack(event.getBlock().getType(), 1));
+
+                    // Convert to droppable sign
+                    Material droppableSign;
+                    switch (event.getBlock().getType()) {
+                        case OAK_WALL_SIGN:
+                            droppableSign = Material.OAK_SIGN;
+                            break;
+                        case SPRUCE_WALL_SIGN:
+                            droppableSign = Material.SPRUCE_SIGN;
+                            break;
+                        case BIRCH_WALL_SIGN:
+                            droppableSign = Material.BIRCH_SIGN;
+                            break;
+                        case ACACIA_WALL_SIGN:
+                            droppableSign = Material.ACACIA_SIGN;
+                            break;
+                        case JUNGLE_WALL_SIGN:
+                            droppableSign = Material.JUNGLE_SIGN;
+                            break;
+                        case DARK_OAK_WALL_SIGN:
+                            droppableSign = Material.DARK_OAK_SIGN;
+                            break;
+                        case CRIMSON_WALL_SIGN:
+                            droppableSign = Material.CRIMSON_SIGN;
+                            break;
+                        case WARPED_WALL_SIGN:
+                            droppableSign = Material.WARPED_SIGN;
+                            break;
+                        default:
+                            droppableSign = Material.OAK_SIGN;
+                            break;
+                    }
+                    event.getBlock().getLocation().getWorld().dropItem(event.getBlock().getLocation(), new ItemStack(droppableSign, 1));
             		return;
             	}
                 boolean Worked = true;
