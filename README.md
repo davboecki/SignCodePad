@@ -59,9 +59,9 @@ An example of the advanced code pad sign above. The left torch is the Error torc
 
 ### Permissions
 * signcodepad.use (Permission to use a SignCodePad an the SignCodePad Calibration)[User]
-* signcodepad.create (Permission to create a SignCodePad)[User]
-* signcodepad.replaceblock (Permission to replace a not air block with a torch)[Admin]
+* signcodepad.create (Permission to create a SignCodePad. Require signcodepad.use!)[User]
 * signcodepad.masterdestroy (Permission to destroy SignCodePads without being the owner)[Admin]
+* signcodepad.replaceblock (Permission to replace a not air block with a torch)[Admin]
 
 ### Sign code pad
 <img src="./img/img11.png" width="350">
